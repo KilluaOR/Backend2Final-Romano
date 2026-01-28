@@ -1,0 +1,49 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-4">
+  <div class="container-fluid">
+    <h2 class="navbar-brand m-0">Ecommerce Coder</h2>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      {{#if user}}
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex" style="gap: 1rem;">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/realtimeproducts">Lista de productos en tiempo real</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/products">Productos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cart/{{user.cart}}" id="cart-link">Carrito</a>
+        </li>
+      </ul>
+      {{/if}}
+
+      <div class="d-flex align-items-center gap-2">
+        {{#if user}}
+          <span class="navbar-text m-0">Hola {{user.first_name}}</span>
+          <form action="/api/sessions/logout" method="POST" class="m-0">
+            <button class="btn btn-outline-danger btn-sm" type="submit">Cerrar sesión</button>
+          </form>
+        {{else}}
+          <a class="btn btn-outline-primary btn-sm" href="/login">Login</a>
+          <a class="btn btn-primary btn-sm" href="/register">Registro</a>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</nav>
+

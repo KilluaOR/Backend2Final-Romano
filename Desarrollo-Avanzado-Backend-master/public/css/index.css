@@ -1,0 +1,102 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: white;
+    color: #212529;
+}
+
+hr {
+    width: 100%;
+    border-color: #dee2e6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #212529;
+}
+
+h3 {
+    text-align: center;
+}
+
+p {
+    color: #212529;
+}
+
+input {
+    background: white;
+    color: #212529;
+}
+
+a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+.button {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.products-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+}
+
+.products-form form {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.products-form input {
+    margin-bottom: 5px;
+}
+
+.footer {
+    margin-top: 10px;
+}
+
+/* Botones de carrito y volver ahora están en el navbar */
+
+#button-create, #button-products {
+    background: #1da81d;
+}
+
+#button-delete {
+    background: #d51515;
+}
+
+#button-paginate {
+    background: #646464;
+}
+
+#button-cart {
+    background: #ffa500;
+}

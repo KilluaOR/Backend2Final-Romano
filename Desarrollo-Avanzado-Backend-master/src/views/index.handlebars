@@ -1,0 +1,40 @@
+<h1 class="mb-4">Lista de productos</h1>
+
+<div class="row g-3">
+  {{#if products.length}}
+    {{#each products}}
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{#if this.title}}{{this.title}}{{else}}Sin título{{/if}}</h5>
+            <p class="card-text text-muted mb-2">
+              {{#if this.description}}{{this.description}}{{else}}Sin descripción{{/if}}
+            </p>
+            <p class="mb-1"><strong>Precio:</strong> ${{#if this.price}}{{this.price}}{{else}}0{{/if}}</p>
+            <p class="mb-3"><strong>Categoría:</strong> {{#if this.category}}{{this.category}}{{else}}Sin categoría{{/if}}</p>
+
+            <div class="mt-auto d-flex gap-2">
+              <button class="btn btn-primary w-100" onclick="addToCart('{{this._id}}')">Agregar al carrito</button>
+              <a class="btn btn-outline-secondary w-100" href="/products/{{this._id}}">Ver detalles</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{/each}}
+  {{else}}
+    <div class="col-12">
+      <div class="alert alert-warning mb-0">No hay productos disponibles en este momento.</div>
+    </div>
+  {{/if}}
+</div>
+
+<nav class="mt-4 d-flex justify-content-center gap-2">
+  {{#if prevLink.exist}}
+    <a class="btn btn-outline-secondary" href="{{prevLink.link}}">« Anterior</a>
+  {{/if}}
+  {{#if nextLink.exist}}
+    <a class="btn btn-outline-secondary" href="{{nextLink.link}}">Siguiente »</a>
+  {{/if}}
+</nav>
+
+<script src="/js/ecommerce.js"></script>

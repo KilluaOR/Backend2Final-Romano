@@ -1,0 +1,23 @@
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="mb-0">Detalle del producto</h1>
+  <a href="/products" class="btn btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h3 class="card-title">{{product.title}}</h3>
+    <p class="card-text text-muted">{{product.description}}</p>
+
+    <ul class="list-group list-group-flush mb-3">
+      <li class="list-group-item"><strong>Precio:</strong> ${{product.price}}</li>
+      <li class="list-group-item"><strong>Categoría:</strong> {{product.category}}</li>
+      <li class="list-group-item"><strong>Stock:</strong> {{product.stock}}</li>
+      <li class="list-group-item"><strong>Código:</strong> {{product.code}}</li>
+    </ul>
+
+    <button class="btn btn-primary" onclick="addToCart('{{product._id}}')">Agregar al carrito</button>
+  </div>
+</div>
+
+<script src="/js/ecommerce.js"></script>
+

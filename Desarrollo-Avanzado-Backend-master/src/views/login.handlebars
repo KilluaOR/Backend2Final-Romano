@@ -1,0 +1,50 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h1 class="mb-4">Login</h1>
+      <form id="login-form" class="mb-4">
+        <input class="form-control mb-2" type="email" id="email" name="email" placeholder="Email" required />
+        <input class="form-control mb-2" type="password" id="password" name="password" placeholder="Contraseña" required />
+        <button class="btn btn-primary w-100" type="submit">Iniciar sesión</button>
+      </form>
+      <p class="text-center">¿No tenés cuenta? <a href="/register">Registrate</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const loginForm = document.getElementById('login-form');
+
+  loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const body = {
+      email: loginForm.email.value,
+      password: loginForm.password.value,
+    };
+
+    try {
+      const response = await fetch('/api/sessions/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.status === 'error') {
+        alert(data.message || 'Credenciales inválidas');
+        return;
+      }
+
+      alert('Login exitoso');
+      window.location.href = '/products';
+    } catch (error) {
+      console.error(error);
+      alert('Error inesperado al iniciar sesión');
+    }
+  });
+</script>
+
