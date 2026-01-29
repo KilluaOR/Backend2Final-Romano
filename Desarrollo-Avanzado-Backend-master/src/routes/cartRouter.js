@@ -54,7 +54,6 @@ router.post('/:cid/product/:pid', async (req, res) => {
     }
 });
 
-// Alias (consigna): /:cid/products/:pid
 router.post('/:cid/products/:pid', async (req, res) => {
     try {
         const result = await CartService.addProductByID(req.params.cid, req.params.pid)
@@ -86,7 +85,6 @@ router.delete('/:cid/product/:pid', async (req, res) => {
     }
 });
 
-// Alias (consigna): DELETE /:cid/products/:pid
 router.delete('/:cid/products/:pid', async (req, res) => {
     try {
         const result = await CartService.deleteProductByID(req.params.cid, req.params.pid)
@@ -134,7 +132,6 @@ router.put('/:cid/product/:pid', async (req, res) => {
     }
 });
 
-// Alias (consigna): PUT /:cid/products/:pid (solo quantity)
 router.put('/:cid/products/:pid', async (req, res) => {
     try {
         const result = await CartService.updateProductByID(req.params.cid, req.params.pid, req.body.quantity)

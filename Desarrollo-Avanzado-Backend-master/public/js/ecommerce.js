@@ -17,5 +17,3 @@ async function addToCart(pid) {
 
     alert('Producto añadido satisfactoriamente!');
 }
-
-// showButtonCart ya no es necesario: el navbar usa /cart/{{user.cart}}

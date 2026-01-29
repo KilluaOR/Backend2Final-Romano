@@ -112,7 +112,6 @@ router.get('/cart/:cid', requireAuth, async (req, res) => {
     }
 });
 
-// Alias (consigna): /carts/:cid
 router.get('/carts/:cid', requireAuth, async (req, res) => {
     try {
         const response = await CartService.getProductsFromCartByID(req.params.cid);

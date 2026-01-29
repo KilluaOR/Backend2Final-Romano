@@ -9,7 +9,7 @@ const LocalStrategy = local.Strategy;
 const JWTStrategy = jwt.Strategy;
 const ExtractJWT = jwt.ExtractJwt;
 
-const JWT_SECRET = 'coderSecretJWT'; // para el proyecto de curso; idealmente usar env var
+const JWT_SECRET = process.env.JWT_SECRET || 'coderSecretJWT';
 
 export const initializePassport = () => {
   // Registro
@@ -25,6 +25,11 @@ export const initializePassport = () => {
         try {
           const { first_name, last_name, age } = req.body;
 
+          const ageNum = age !== undefined && age !== '' ? Number(age) : NaN;
+          if (!Number.isInteger(ageNum) || ageNum < 0) {
+            return done(null, false, { message: 'Edad inválida (debe ser un número entero >= 0)' });
+          }
+
           const existingUser = await userModel.findOne({ email });
           if (existingUser) {
             return done(null, false, { message: 'El usuario ya existe' });
@@ -33,10 +38,10 @@ export const initializePassport = () => {
           const cart = await cartModel.create({ products: [] });
 
           const newUser = await userModel.create({
-            first_name,
-            last_name,
-            email,
-            age,
+            first_name: first_name?.trim(),
+            last_name: last_name?.trim(),
+            email: email?.trim().toLowerCase(),
+            age: ageNum,
             password: createHash(password),
             cart: cart._id,
           });
@@ -82,7 +87,7 @@ export const initializePassport = () => {
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJWT.fromExtractors([
-          (req) => req?.cookies?.jwtCookie,
+          (req) => req?.signedCookies?.jwtCookie || req?.cookies?.jwtCookie,
         ]),
         secretOrKey: JWT_SECRET,
       },
@@ -100,13 +105,13 @@ export const initializePassport = () => {
     )
   );
 
-  // Estrategia "current" (alias de JWT) para cumplir consigna
+  // Estrategia "current" 
   passport.use(
     'current',
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJWT.fromExtractors([
-          (req) => req?.cookies?.jwtCookie,
+          (req) => req?.signedCookies?.jwtCookie || req?.cookies?.jwtCookie,
         ]),
         secretOrKey: JWT_SECRET,
       },
