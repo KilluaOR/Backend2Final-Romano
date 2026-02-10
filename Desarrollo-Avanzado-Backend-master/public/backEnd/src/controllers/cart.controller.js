@@ -1,12 +1,8 @@
-import { productDBManager } from "../dao/productDBManager.js";
-import { cartDBManager } from "../dao/cartDBManager.js";
-
-const ProductService = new productDBManager();
-const CartService = new cartDBManager(ProductService);
+import { cartRepository } from "../repositories/cart.repository.js";
 
 export const getProductsFromCartByID = async (req, res) => {
   try {
-    const result = await CartService.getProductsFromCartByID(req.params.cid);
+    const result = await cartRepository.getCart(req.params.cid);
     res.send({
       status: "success",
       payload: result,
@@ -21,7 +17,7 @@ export const getProductsFromCartByID = async (req, res) => {
 
 export const createCart = async (req, res) => {
   try {
-    const result = await CartService.createCart();
+    const result = await cartRepository.createCart();
     res.send({
       status: "success",
       payload: result,
@@ -36,7 +32,7 @@ export const createCart = async (req, res) => {
 
 export const addProductByID = async (req, res) => {
   try {
-    const result = await CartService.addProductByID(
+    const result = await cartRepository.addProduct(
       req.params.cid,
       req.params.pid,
     );
@@ -54,7 +50,7 @@ export const addProductByID = async (req, res) => {
 
 export const deleteProductByID = async (req, res) => {
   try {
-    const result = await CartService.deleteProductByID(
+    const result = await cartRepository.deleteProduct(
       req.params.cid,
       req.params.pid,
     );
@@ -72,7 +68,7 @@ export const deleteProductByID = async (req, res) => {
 
 export const updateAllProducts = async (req, res) => {
   try {
-    const result = await CartService.updateAllProducts(
+    const result = await cartRepository.updateAllProducts(
       req.params.cid,
       req.body.products,
     );
@@ -90,7 +86,7 @@ export const updateAllProducts = async (req, res) => {
 
 export const updateProductByID = async (req, res) => {
   try {
-    const result = await CartService.updateProductByID(
+    const result = await cartRepository.updateProduct(
       req.params.cid,
       req.params.pid,
       req.body.quantity,
@@ -109,7 +105,7 @@ export const updateProductByID = async (req, res) => {
 
 export const deleteAllProducts = async (req, res) => {
   try {
-    const result = await CartService.deleteAllProducts(req.params.cid);
+    const result = await cartRepository.emptyCart(req.params.cid);
     res.send({
       status: "success",
       payload: result,

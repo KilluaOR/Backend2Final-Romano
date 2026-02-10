@@ -1,9 +1,8 @@
 import passport from 'passport';
 import local from 'passport-local';
 import jwt from 'passport-jwt';
-import { userModel } from '../dao/models/userModel.js';
-import { cartModel } from '../dao/models/cartModel.js';
-import { createHash, isValidPassword } from '../utils/bcryptUtil.js';
+import { userRepository } from '../repositories/user.repository.js';
+import { isValidPassword } from '../utils/bcryptUtil.js';
 
 const LocalStrategy = local.Strategy;
 const JWTStrategy = jwt.Strategy;
@@ -12,7 +11,7 @@ const ExtractJWT = jwt.ExtractJwt;
 const JWT_SECRET = process.env.JWT_SECRET || 'coderSecretJWT';
 
 export const initializePassport = () => {
-  // Registro
+  // Registro (usa UserRepository: crear carrito + usuario)
   passport.use(
     'register',
     new LocalStrategy(
@@ -24,29 +23,17 @@ export const initializePassport = () => {
       async (req, email, password, done) => {
         try {
           const { first_name, last_name, age } = req.body;
-
-          const ageNum = age !== undefined && age !== '' ? Number(age) : NaN;
-          if (!Number.isInteger(ageNum) || ageNum < 0) {
-            return done(null, false, { message: 'Edad inválida (debe ser un número entero >= 0)' });
-          }
-
-          const existingUser = await userModel.findOne({ email });
-          if (existingUser) {
-            return done(null, false, { message: 'El usuario ya existe' });
-          }
-
-          const cart = await cartModel.create({ products: [] });
-
-          const newUser = await userModel.create({
-            first_name: first_name?.trim(),
-            last_name: last_name?.trim(),
-            email: email?.trim().toLowerCase(),
-            age: ageNum,
-            password: createHash(password),
-            cart: cart._id,
+          const result = await userRepository.register({
+            first_name,
+            last_name,
+            email,
+            age,
+            password,
           });
-
-          return done(null, newUser);
+          if (!result.success) {
+            return done(null, false, { message: result.message });
+          }
+          return done(null, result.user);
         } catch (error) {
           return done(error);
         }
@@ -54,7 +41,7 @@ export const initializePassport = () => {
     )
   );
 
-  // Login
+  // Login (usa UserRepository)
   passport.use(
     'login',
     new LocalStrategy(
@@ -64,15 +51,13 @@ export const initializePassport = () => {
       },
       async (email, password, done) => {
         try {
-          const user = await userModel.findOne({ email });
+          const user = await userRepository.getByEmail(email);
           if (!user) {
             return done(null, false, { message: 'Usuario no encontrado' });
           }
-
           if (!isValidPassword(user, password)) {
             return done(null, false, { message: 'Credenciales inválidas' });
           }
-
           return done(null, user);
         } catch (error) {
           return done(error);
@@ -81,7 +66,7 @@ export const initializePassport = () => {
     )
   );
 
-  // JWT strategy para endpoints protegidos (incluido /current)
+  // JWT strategy para endpoints protegidos
   passport.use(
     'jwt',
     new JWTStrategy(
@@ -93,10 +78,8 @@ export const initializePassport = () => {
       },
       async (jwtPayload, done) => {
         try {
-          const user = await userModel.findById(jwtPayload.id);
-          if (!user) {
-            return done(null, false);
-          }
+          const user = await userRepository.getById(jwtPayload.id);
+          if (!user) return done(null, false);
           return done(null, user);
         } catch (error) {
           return done(error);
@@ -105,7 +88,7 @@ export const initializePassport = () => {
     )
   );
 
-  // Estrategia "current" 
+  // Estrategia "current" (usa UserRepository)
   passport.use(
     'current',
     new JWTStrategy(
@@ -117,10 +100,8 @@ export const initializePassport = () => {
       },
       async (jwtPayload, done) => {
         try {
-          const user = await userModel.findById(jwtPayload.id);
-          if (!user) {
-            return done(null, false);
-          }
+          const user = await userRepository.getById(jwtPayload.id);
+          if (!user) return done(null, false);
           return done(null, user);
         } catch (error) {
           return done(error);

@@ -2,6 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import { jwtSecret } from "../config/passport.config.js";
+import { toUserCurrentDTO } from "../dto/user.dto.js";
 
 const router = Router();
 
@@ -103,15 +104,7 @@ router.get("/current", (req, res, next) => {
     }
     res.send({
       status: "success",
-      payload: {
-        id: user._id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        age: user.age,
-        role: user.role,
-        cart: user.cart,
-      },
+      payload: toUserCurrentDTO(user),
     });
   })(req, res, next);
 });
