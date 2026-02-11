@@ -25,6 +25,29 @@ class UserDAO {
     const user = await userModel.create(data);
     return user;
   }
+
+  /** Para respuestas API: usuario sin password */
+  async findByIdSafe(id) {
+    const user = await userModel.findById(id).select("-password").lean();
+    return user ?? null;
+  }
+
+  async findAll() {
+    return userModel.find().select("-password").lean();
+  }
+
+  async update(id, data) {
+    const user = await userModel
+      .findByIdAndUpdate(id, data, { new: true })
+      .select("-password")
+      .lean();
+    return user ?? null;
+  }
+
+  async delete(id) {
+    const result = await userModel.deleteOne({ _id: id });
+    return result;
+  }
 }
 
 const userDAO = new UserDAO();

@@ -11,6 +11,23 @@ export const userRepository = {
     return userDAO.findById(id);
   },
 
+  /** Para API: usuario sin password */
+  async getByIdSafe(id) {
+    return userDAO.findByIdSafe(id);
+  },
+
+  async getAll() {
+    return userDAO.findAll();
+  },
+
+  async update(uid, data) {
+    return userDAO.update(uid, data);
+  },
+
+  async delete(uid) {
+    return userDAO.delete(uid);
+  },
+
   async getByEmail(email) {
     return userDAO.findByEmail(email);
   },

@@ -6,8 +6,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/app.js",
-    "dev": "node --watch src/app.js"
+    "start": "nodemon backEnd/src/app.js",
+    "dev": "node --watch backEnd/src/app.js"
   },
   "keywords": [],
   "author": "Ornella Romano",
