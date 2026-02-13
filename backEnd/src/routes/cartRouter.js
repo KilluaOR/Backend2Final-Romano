@@ -1,6 +1,6 @@
 import { Router } from "express";
-// import { productDBManager } from "../dao/productDBManager.js";
-// import { cartDBManager } from "../dao/cartDBManager.js";
+import passport from "passport";
+import { requireUserCart } from "../middlewares/authorization.middleware.js";
 import {
   addProductByID,
   createCart,
@@ -12,21 +12,49 @@ import {
 } from "../controllers/cart.controller.js";
 
 const router = Router();
-// const ProductService = new productDBManager();
-// const CartService = new cartDBManager(ProductService);
 
-router.get("/:cid", getProductsFromCartByID);
+router.get(
+  "/:cid",
+  passport.authenticate("current", { session: false }),
+  requireUserCart,
+  getProductsFromCartByID,
+);
 
 router.post("/", createCart);
 
-router.post("/:cid/products/:pid", addProductByID);
+router.post(
+  "/:cid/products/:pid",
+  passport.authenticate("current", { session: false }),
+  requireUserCart,
+  addProductByID,
+);
 
-router.delete("/:cid/products/:pid", deleteProductByID);
+router.delete(
+  "/:cid/products/:pid",
+  passport.authenticate("current", { session: false }),
+  requireUserCart,
+  deleteProductByID,
+);
 
-router.put("/:cid", updateAllProducts);
+router.put(
+  "/:cid",
+  passport.authenticate("current", { session: false }),
+  requireUserCart,
+  updateAllProducts,
+);
 
-router.put("/:cid/product/:pid", updateProductByID);
+router.put(
+  "/:cid/product/:pid",
+  passport.authenticate("current", { session: false }),
+  requireUserCart,
+  updateProductByID,
+);
 
-router.delete("/:cid", deleteAllProducts);
+router.delete(
+  "/:cid",
+  passport.authenticate("current", { session: false }),
+  requireUserCart,
+  deleteAllProducts,
+);
 
 export default router;
