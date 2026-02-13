@@ -1,29 +1,92 @@
-import { productDBManager } from '../dao/productDBManager.js';
+import { productDAO } from "../dao/productDBManager.js";
 
-const productDAO = new productDBManager();
-
-/**
- * Repository de productos. Usa el DAO y concentra la lógica de negocio.
- * La restricción "solo admin" se aplica en rutas con middleware, no aquí.
- */
 export const productRepository = {
   async getAll(params) {
-    return productDAO.getAllProducts(params);
+    const page = params?.page ? parseInt(params.page) : 1;
+    const limit = params?.limit ? parseInt(params.limit) : 10;
+    const options = { page, limit };
+    if (params?.sort === "asc" || params?.sort === "desc") {
+      options.sort = { price: params.sort };
+    }
+
+    let filter = {};
+    if (params?.query) {
+      const q = params.query;
+      if (q === "true" || q === "false") {
+        filter.status = q === "true";
+      } else {
+        filter.category = q;
+      }
+    }
+
+    const result = await productDAO.findPaginated(filter, options);
+
+    result.prevLink = result.hasPrevPage
+      ? `/products?page=${result.prevPage}`
+      : null;
+    result.nextLink = result.hasNextPage
+      ? `/products?page=${result.nextPage}`
+      : null;
+    if (limit !== 10) {
+      if (result.prevLink) result.prevLink += `&limit=${limit}`;
+      if (result.nextLink) result.nextLink += `&limit=${limit}`;
+    }
+    if (params?.sort) {
+      if (result.prevLink) result.prevLink += `&sort=${params.sort}`;
+      if (result.nextLink) result.nextLink += `&sort=${params.sort}`;
+    }
+
+    return result;
   },
 
   async getById(pid) {
-    return productDAO.getProductByID(pid);
+    const product = await productDAO.findById(pid);
+    if (!product) {
+      throw new Error(`El producto ${pid} no existe`);
+    }
+    return product;
   },
 
   async create(productData) {
-    return productDAO.createProduct(productData);
+    const {
+      title,
+      description,
+      code,
+      price,
+      stock,
+      category,
+      thumbnails,
+      status,
+    } = productData;
+    if (!title || !description || !code || !price || !stock || !category) {
+      throw new Error("Faltan campos requeridos para crear el producto");
+    }
+    return productDAO.create({
+      title,
+      description,
+      code,
+      price,
+      stock,
+      category,
+      thumbnails: thumbnails ?? [],
+      status: status ?? true,
+    });
   },
 
   async update(pid, productUpdate) {
-    return productDAO.updateProduct(pid, productUpdate);
+    const product = await productDAO.findById(pid);
+    if (!product) {
+      throw new Error(`El producto ${pid} no existe`);
+    }
+    await productDAO.update(pid, productUpdate);
+    return productDAO.findById(pid);
   },
 
   async delete(pid) {
-    return productDAO.deleteProduct(pid);
+    const result = await productDAO.delete(pid);
+    if (result.deletedCount === 0) {
+      throw new Error(`El producto ${pid} no existe`);
+    }
+    return result;
   },
 };

@@ -1,11 +1,3 @@
-/**
- * DTO (Data Transfer Object) para el usuario actual.
- * Transforma el documento de usuario de la BD en un objeto seguro para la API:
- * solo campos que puede ver el cliente, sin password ni __v.
- *
- * @param {Object} userDoc - Documento de Mongoose (puede ser plain object o doc)
- * @returns {Object} { id, first_name, last_name, email, age, role, cart }
- */
 export function toUserCurrentDTO(userDoc) {
   if (!userDoc) return null;
   return {

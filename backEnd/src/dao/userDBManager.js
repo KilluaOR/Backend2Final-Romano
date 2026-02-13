@@ -1,9 +1,5 @@
 import { userModel } from "./models/userModel.js";
 
-/**
- * DAO (Data Access Object) de usuarios.
- * Encapsula el acceso a la colección de usuarios en MongoDB.
- */
 class UserDAO {
   async findById(id) {
     const user = await userModel.findById(id);
@@ -17,16 +13,11 @@ class UserDAO {
     return user ?? null;
   }
 
-  /**
-   * Crea un usuario. No crea carrito (eso lo orquesta el Repository).
-   * @param {Object} data - { first_name, last_name, email, age, password, cart }
-   */
   async create(data) {
     const user = await userModel.create(data);
     return user;
   }
 
-  /** Para respuestas API: usuario sin password */
   async findByIdSafe(id) {
     const user = await userModel.findById(id).select("-password").lean();
     return user ?? null;
@@ -47,6 +38,36 @@ class UserDAO {
   async delete(id) {
     const result = await userModel.deleteOne({ _id: id });
     return result;
+  }
+
+  async setResetToken(email, token, expiresAt) {
+    const user = await this.findByEmail(email);
+    if (!user) return null;
+    await userModel.findByIdAndUpdate(user._id, {
+      resetPasswordToken: token,
+      resetPasswordExpires: expiresAt,
+    });
+    return user;
+  }
+
+  async findByResetToken(token) {
+    const user = await userModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    });
+    return user ?? null;
+  }
+
+  async updatePassword(userId, hashedPassword) {
+    const user = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        password: hashedPassword,
+        $unset: { resetPAsswordToken: "", resetPasswordExpires: "" },
+      },
+      { new: true },
+    );
+    return user ?? null;
   }
 }
 

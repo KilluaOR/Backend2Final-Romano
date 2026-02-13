@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const userCollection = 'users';
+const userCollection = "users";
 
 const userSchema = new mongoose.Schema({
   first_name: {
@@ -26,14 +26,21 @@ const userSchema = new mongoose.Schema({
   },
   cart: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'carts',
+    ref: "carts",
   },
   role: {
     type: String,
-    default: 'user',
-    enum: ['user', 'admin'],
+    default: "user",
+    enum: ["user", "admin"],
+  },
+  resetPasswordToken: {
+    type: String,
+    require: false,
+  },
+  resetPasswordExpires: {
+    type: Date,
+    require: false,
   },
 });
 
 export const userModel = mongoose.model(userCollection, userSchema);
-
