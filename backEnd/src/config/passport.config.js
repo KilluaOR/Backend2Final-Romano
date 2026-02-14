@@ -1,29 +1,28 @@
-import passport from 'passport';
-import local from 'passport-local';
-import jwt from 'passport-jwt';
-import { userRepository } from '../repositories/user.repository.js';
-import { isValidPassword } from '../utils/bcryptUtil.js';
+import passport from "passport";
+import local from "passport-local";
+import jwt from "passport-jwt";
+import { userService } from "../services/user.service.js";
+import { isValidPassword } from "../utils/bcryptUtil.js";
 
 const LocalStrategy = local.Strategy;
 const JWTStrategy = jwt.Strategy;
 const ExtractJWT = jwt.ExtractJwt;
 
-const JWT_SECRET = process.env.JWT_SECRET || 'coderSecretJWT';
+const JWT_SECRET = process.env.JWT_SECRET || "coderSecretJWT";
 
 export const initializePassport = () => {
-  // Registro (usa UserRepository: crear carrito + usuario)
   passport.use(
-    'register',
+    "register",
     new LocalStrategy(
       {
-        usernameField: 'email',
+        usernameField: "email",
         passReqToCallback: true,
         session: false,
       },
       async (req, email, password, done) => {
         try {
           const { first_name, last_name, age } = req.body;
-          const result = await userRepository.register({
+          const result = await userService.register({
             first_name,
             last_name,
             email,
@@ -37,38 +36,37 @@ export const initializePassport = () => {
         } catch (error) {
           return done(error);
         }
-      }
-    )
+      },
+    ),
   );
 
-  // Login (usa UserRepository)
   passport.use(
-    'login',
+    "login",
     new LocalStrategy(
       {
-        usernameField: 'email',
+        usernameField: "email",
         session: false,
       },
       async (email, password, done) => {
         try {
-          const user = await userRepository.getByEmail(email);
+          const user = await userService.getByEmail(email);
           if (!user) {
-            return done(null, false, { message: 'Usuario no encontrado' });
+            return done(null, false, { message: "Usuario no encontrado" });
           }
           if (!isValidPassword(user, password)) {
-            return done(null, false, { message: 'Credenciales inválidas' });
+            return done(null, false, { message: "Credenciales inválidas" });
           }
           return done(null, user);
         } catch (error) {
           return done(error);
         }
-      }
-    )
+      },
+    ),
   );
 
   // JWT strategy para endpoints protegidos
   passport.use(
-    'jwt',
+    "jwt",
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJWT.fromExtractors([
@@ -78,19 +76,19 @@ export const initializePassport = () => {
       },
       async (jwtPayload, done) => {
         try {
-          const user = await userRepository.getById(jwtPayload.id);
+          const user = await userService.getById(jwtPayload.id);
           if (!user) return done(null, false);
           return done(null, user);
         } catch (error) {
           return done(error);
         }
-      }
-    )
+      },
+    ),
   );
 
-  // Estrategia "current" (usa UserRepository)
+  // Estrategia "current"
   passport.use(
-    'current',
+    "current",
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJWT.fromExtractors([
@@ -100,16 +98,15 @@ export const initializePassport = () => {
       },
       async (jwtPayload, done) => {
         try {
-          const user = await userRepository.getById(jwtPayload.id);
+          const user = await userService.getById(jwtPayload.id);
           if (!user) return done(null, false);
           return done(null, user);
         } catch (error) {
           return done(error);
         }
-      }
-    )
+      },
+    ),
   );
 };
 
 export const jwtSecret = JWT_SECRET;
-

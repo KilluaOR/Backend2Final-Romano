@@ -1,7 +1,7 @@
-import { productRepository } from "../repositories/product.repository.js";
+import { productService } from "../services/product.service.js";
 
 export const getAll = async (req, res) => {
-  const result = await productRepository.getAll(req.query);
+  const result = await productService.getAll(req.query);
 
   res.send({
     status: "success",
@@ -17,7 +17,7 @@ export const getAll = async (req, res) => {
 
 export const getById = async (req, res) => {
   try {
-    const result = await productRepository.getById(req.params.pid);
+    const result = await productService.getById(req.params.pid);
     res.send({
       status: "success",
       payload: result,
@@ -39,7 +39,7 @@ export const create = async (req, res) => {
   }
 
   try {
-    const result = await productRepository.create(req.body);
+    const result = await productService.create(req.body);
     res.send({
       status: "success",
       payload: result,
@@ -61,7 +61,7 @@ export const update = async (req, res) => {
   }
 
   try {
-    const result = await productRepository.update(req.params.pid, req.body);
+    const result = await productService.update(req.params.pid, req.body);
     res.send({
       status: "success",
       payload: result,
@@ -76,7 +76,7 @@ export const update = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const result = await productRepository.deleteProduct(req.params.pid);
+    const result = await productService.deleteProduct(req.params.pid);
     res.send({
       status: "success",
       payload: result,

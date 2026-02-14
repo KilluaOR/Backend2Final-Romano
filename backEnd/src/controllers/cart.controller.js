@@ -1,8 +1,8 @@
-import { cartRepository } from "../repositories/cart.repository.js";
+import { cartService } from "../services/cart.service.js";
 
 export const getProductsFromCartByID = async (req, res) => {
   try {
-    const result = await cartRepository.getCart(req.params.cid);
+    const result = await cartService.getCart(req.params.cid);
     res.send({
       status: "success",
       payload: result,
@@ -17,7 +17,7 @@ export const getProductsFromCartByID = async (req, res) => {
 
 export const createCart = async (req, res) => {
   try {
-    const result = await cartRepository.createCart();
+    const result = await cartService.createCart();
     res.send({
       status: "success",
       payload: result,
@@ -32,10 +32,7 @@ export const createCart = async (req, res) => {
 
 export const addProductByID = async (req, res) => {
   try {
-    const result = await cartRepository.addProduct(
-      req.params.cid,
-      req.params.pid,
-    );
+    const result = await cartService.addProduct(req.params.cid, req.params.pid);
     res.send({
       status: "success",
       payload: result,
@@ -50,7 +47,7 @@ export const addProductByID = async (req, res) => {
 
 export const deleteProductByID = async (req, res) => {
   try {
-    const result = await cartRepository.deleteProduct(
+    const result = await cartService.deleteProduct(
       req.params.cid,
       req.params.pid,
     );
@@ -68,7 +65,7 @@ export const deleteProductByID = async (req, res) => {
 
 export const updateAllProducts = async (req, res) => {
   try {
-    const result = await cartRepository.updateAllProducts(
+    const result = await cartService.updateAllProducts(
       req.params.cid,
       req.body.products,
     );
@@ -86,7 +83,7 @@ export const updateAllProducts = async (req, res) => {
 
 export const updateProductByID = async (req, res) => {
   try {
-    const result = await cartRepository.updateProduct(
+    const result = await cartService.updateProduct(
       req.params.cid,
       req.params.pid,
       req.body.quantity,
@@ -105,7 +102,7 @@ export const updateProductByID = async (req, res) => {
 
 export const deleteAllProducts = async (req, res) => {
   try {
-    const result = await cartRepository.emptyCart(req.params.cid);
+    const result = await cartService.emptyCart(req.params.cid);
     res.send({
       status: "success",
       payload: result,

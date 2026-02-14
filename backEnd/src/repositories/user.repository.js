@@ -1,6 +1,7 @@
 import { userDAO } from "../dao/userDBManager.js";
 import { createHash } from "../utils/bcryptUtil.js";
 import { cartRepository } from "./cart.repository.js";
+import crypto from "crypto";
 
 export const userRepository = {
   async getById(id) {

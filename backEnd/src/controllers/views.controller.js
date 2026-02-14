@@ -1,5 +1,5 @@
-import { productRepository } from "../repositories/product.repository.js";
-import { cartRepository } from "../repositories/cart.repository.js";
+import { productService } from "../services/product.service.js";
+import { cartService } from "../services/cart.service.js";
 
 export function getLogin(req, res) {
   if (res.locals.user) {
@@ -29,7 +29,7 @@ export function getHome(req, res) {
 }
 
 export async function getProductsList(req, res) {
-  const products = await productRepository.getAll(req.query);
+  const products = await productService.getAll(req.query);
   res.render("productsList", {
     title: "Productos",
     style: "index.css",
@@ -47,7 +47,7 @@ export async function getProductsList(req, res) {
 
 export async function getProductDetail(req, res) {
   try {
-    const product = await productRepository.getById(req.params.pid);
+    const product = await productService.getById(req.params.pid);
     res.render("productDetail", {
       title: "Detalle de producto",
       style: "index.css",
@@ -62,7 +62,7 @@ export async function getProductDetail(req, res) {
 }
 
 export async function getRealTimeProducts(req, res) {
-  const products = await productRepository.getAll(req.query);
+  const products = await productService.getAll(req.query);
   res.render("realTimeProducts", {
     title: "Productos",
     style: "index.css",
@@ -72,7 +72,7 @@ export async function getRealTimeProducts(req, res) {
 
 export async function getCartDetail(req, res) {
   try {
-    const response = await cartRepository.getCart(req.params.cid);
+    const response = await cartService.getCart(req.params.cid);
     res.render("cartDetail", {
       title: "Carrito",
       style: "index.css",

@@ -1,7 +1,7 @@
-import { userRepository } from "../repositories/user.repository.js";
+import { userService } from "../services/user.service.js";
 
 export async function getAll(req, res) {
-  const users = await userRepository.getAll();
+  const users = await userService.getAll();
   res.send({ status: "success", payload: users });
 }
 
@@ -14,7 +14,7 @@ export async function getById(req, res) {
     return res.status(403).send({ status: "error", message: "Forbidden" });
   }
 
-  const user = await userRepository.getByIdSafe(uid);
+  const user = await userService.getByIdSafe(uid);
   if (!user) {
     return res.status(404).send({ status: "error", message: "User not found" });
   }
@@ -37,7 +37,7 @@ export async function update(req, res) {
   if (typeof age !== "undefined") updateData.age = Number(age);
   if (isAdmin && typeof role === "string") updateData.role = role;
 
-  const updated = await userRepository.update(uid, updateData);
+  const updated = await userService.update(uid, updateData);
   if (!updated) {
     return res.status(404).send({ status: "error", message: "User not found" });
   }
@@ -46,7 +46,7 @@ export async function update(req, res) {
 
 export async function deleteUser(req, res) {
   const { uid } = req.params;
-  const result = await userRepository.delete(uid);
+  const result = await userService.delete(uid);
   if (result.deletedCount === 0) {
     return res.status(404).send({ status: "error", message: "User not found" });
   }
