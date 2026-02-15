@@ -55,4 +55,33 @@ export const userRepository = {
     });
     return { success: true, user };
   },
+
+  async requestPasswordReset(email) {
+    const user = await userDAO.findByEmail(email);
+    if (!user) {
+      return { success: false, message: "Usuario no encontrado" };
+    }
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+    await userDAO.setResetToken(user.email, token, expiresAt);
+    // TODO: enviar email con link de reset (crear utils/mailer.js y BASE_URL)
+    return {
+      success: true,
+      message:
+        "Si el email existe, recibirás un enlace para restablecer la contraseña",
+    };
+  },
+
+  async resetPassword(token, newPassword) {
+    const user = await userDAO.findByResetToken(token);
+    if (!user) {
+      return { success: false, message: "Token inválido o expirado" };
+    }
+    if (createHash(newPassword) === user.password) {
+      return { success: false, message: "No puedes usar la misma contraseña" };
+    }
+    const hashedPassword = createHash(newPassword);
+    await userDAO.updatePassword(user._id, hashedPassword);
+    return { success: true, message: "Contraseña actualizada" };
+  },
 };

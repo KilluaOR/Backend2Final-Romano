@@ -63,7 +63,7 @@ class UserDAO {
       userId,
       {
         password: hashedPassword,
-        $unset: { resetPAsswordToken: "", resetPasswordExpires: "" },
+        $unset: { resetPasswordToken: "", resetPasswordExpires: "" },
       },
       { new: true },
     );

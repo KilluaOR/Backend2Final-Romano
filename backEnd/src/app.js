@@ -28,7 +28,6 @@ import usersRouter from "./routes/usersRouter.js";
 import __dirname from "./utils/constantsUtil.js";
 import websocket from "./websocket.js";
 import { initializePassport, jwtSecret } from "./config/passport.config.js";
-import { userModel } from "./dao/models/userModel.js";
 import { userService } from "./services/user.service.js";
 
 const app = express();
@@ -143,7 +142,7 @@ app.use(async (req, res, next) => {
 
   try {
     const payload = jwt.verify(token, jwtSecret);
-    const user = await userService.getByIdSafe(payload.id).lean();
+    const user = await userService.getByIdSafe(payload.id);
 
     if (user) {
       res.locals.user = user;

@@ -22,6 +22,10 @@ export const userService = {
   register(data) {
     return userRepository.register(data);
   },
-  // requestPasswordReset(email) { return userRepository.requestPasswordReset(email); },
-  // resetPassword(token, newPassword) { return userRepository.resetPassword(token, newPassword); },
+  requestPasswordReset(email) {
+    return userRepository.requestPasswordReset(email);
+  },
+  resetPassword(token, newPassword) {
+    return userRepository.resetPassword(token, newPassword);
+  },
 };

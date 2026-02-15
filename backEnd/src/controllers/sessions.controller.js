@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { jwtSecret } from "../config/passport.config.js";
 import { toUserCurrentDTO } from "../dto/user.dto.js";
+import { userService } from "../services/user.service.js";
 
 export function registerCallback(req, res, err, user, info) {
   if (err) {
@@ -21,7 +22,7 @@ export function registerCallback(req, res, err, user, info) {
     "Usuario registrado en la BD:",
     user.email,
     "| id:",
-    user._id.toString()
+    user._id.toString(),
   );
   res.status(201).send({
     status: "success",
@@ -53,7 +54,7 @@ export function loginCallback(req, res, err, user, info) {
   const token = jwt.sign(
     { id: user._id, email: user.email, role: user.role },
     jwtSecret,
-    { expiresIn: "1h" }
+    { expiresIn: "1h" },
   );
   const cookieOptions = {
     httpOnly: true,
@@ -94,4 +95,29 @@ export function logout(req, res) {
       signed: !!process.env.COOKIE_SECRET,
     })
     .redirect("/login");
+}
+
+export async function forgotPassword(req, res) {
+  try {
+    const email = await userService.requestPasswordReset(req.body.email);
+    res
+      .status(200)
+      .json({
+        status: "success",
+        message:
+          "Si el email existe, recibirás un enlace para restablecer la contraseña.",
+      });
+  } catch {
+    res
+      .status(00)
+      .json({
+        status: "success",
+        message:
+          "Si el email existe, recibirás un enlace para restablecer la contraseña.",
+      });
+  }
+}
+
+export async function resetPassword(req, res) {
+  // ...
 }
