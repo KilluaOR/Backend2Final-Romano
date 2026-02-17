@@ -3,7 +3,8 @@ import { jwtSecret } from "../config/passport.config.js";
 import { toUserCurrentDTO } from "../dto/user.dto.js";
 import { userService } from "../services/user.service.js";
 
-export function registerCallback(req, res, err, user, info) {
+// --- Registro ---
+export const registerCallback = (req, res, err, user, info) => {
   if (err) {
     console.error("Register error:", err);
     const message =
@@ -12,18 +13,16 @@ export function registerCallback(req, res, err, user, info) {
         : err.message || "Error al registrar";
     return res.status(500).json({ status: "error", message });
   }
+
   if (!user) {
     return res.status(400).json({
       status: "error",
       message: info?.message || "No se pudo crear el usuario",
     });
   }
-  console.log(
-    "Usuario registrado en la BD:",
-    user.email,
-    "| id:",
-    user._id.toString(),
-  );
+
+  console.log("Usuario registrado:", user.email, "| id:", user._id.toString());
+
   res.status(201).send({
     status: "success",
     message: "Usuario registrado correctamente",
@@ -36,45 +35,50 @@ export function registerCallback(req, res, err, user, info) {
       role: user.role,
     },
   });
-}
+};
 
-export function loginCallback(req, res, err, user, info) {
+// --- Login ---
+export const loginCallback = (req, res, err, user, info) => {
   if (err) {
     return res.status(500).json({
       status: "error",
       message: err.message || "Error al iniciar sesión",
     });
   }
+
   if (!user) {
     return res.status(401).json({
       status: "error",
       message: info?.message || "Credenciales inválidas",
     });
   }
+
   const token = jwt.sign(
     { id: user._id, email: user.email, role: user.role },
     jwtSecret,
     { expiresIn: "1h" },
   );
+
   const cookieOptions = {
     httpOnly: true,
     maxAge: 60 * 60 * 1000,
+    signed: !!process.env.COOKIE_SECRET,
   };
-  if (process.env.COOKIE_SECRET) {
-    cookieOptions.signed = true;
-  }
+
   res
     .cookie("jwtCookie", token, cookieOptions)
     .send({ status: "success", message: "Login exitoso" });
-}
+};
 
-export function currentCallback(req, res, err, user, info) {
+// --- Current User ---
+export const currentCallback = (req, res, err, user, info) => {
   if (err) {
     return res.status(500).json({
       status: "error",
       message: err.message || "Error de autenticación",
     });
   }
+
   if (!user) {
     return res.status(401).json({
       status: "error",
@@ -82,42 +86,41 @@ export function currentCallback(req, res, err, user, info) {
         info?.message || "Token inválido o expirado. Iniciá sesión nuevamente.",
     });
   }
+
   res.send({
     status: "success",
     payload: toUserCurrentDTO(user),
   });
-}
+};
 
-export function logout(req, res) {
+// --- Logout ---
+export const logout = (req, res) => {
   res
     .clearCookie("jwtCookie", {
       httpOnly: true,
       signed: !!process.env.COOKIE_SECRET,
     })
     .redirect("/login");
-}
+};
 
-export async function forgotPassword(req, res) {
+// --- Password Reset ---
+export const forgotPassword = async (req, res) => {
   try {
-    const email = await userService.requestPasswordReset(req.body.email);
-    res
-      .status(200)
-      .json({
-        status: "success",
-        message:
-          "Si el email existe, recibirás un enlace para restablecer la contraseña.",
-      });
+    await userService.requestPasswordReset(req.body.email);
+    res.status(200).json({
+      status: "success",
+      message:
+        "Si el email existe, recibirás un enlace para restablecer la contraseña.",
+    });
   } catch {
-    res
-      .status(00)
-      .json({
-        status: "success",
-        message:
-          "Si el email existe, recibirás un enlace para restablecer la contraseña.",
-      });
+    res.status(400).json({
+      status: "success",
+      message:
+        "Si el email existe, recibirás un enlace para restablecer la contraseña.",
+    });
   }
-}
+};
 
-export async function resetPassword(req, res) {
-  // ...
-}
+export const resetPassword = async (req, res) => {
+  // Lógica pendiente
+};
