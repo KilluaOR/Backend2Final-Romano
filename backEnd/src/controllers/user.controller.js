@@ -1,54 +1,91 @@
 import { userService } from "../services/user.service.js";
 
-export async function getAll(req, res) {
-  const users = await userService.getAll();
-  res.send({ status: "success", payload: users });
-}
-
-export async function getById(req, res) {
-  const { uid } = req.params;
-  const isSelf = req.user?._id?.toString() === uid;
-  const isAdmin = req.user?.role === "admin";
-
-  if (!isSelf && !isAdmin) {
-    return res.status(403).send({ status: "error", message: "Forbidden" });
+// --- Obtener todos los usuarios ---
+export const getAll = async (req, res) => {
+  try {
+    const users = await userService.getAll();
+    res.send({ status: "success", payload: users });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: error.message });
   }
+};
 
-  const user = await userService.getByIdSafe(uid);
-  if (!user) {
-    return res.status(404).send({ status: "error", message: "User not found" });
+// --- Obtener por ID ---
+export const getById = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const isSelf = req.user?._id?.toString() === uid;
+    const isAdmin = req.user?.role === "admin";
+
+    if (!isSelf && !isAdmin) {
+      return res.status(403).send({ status: "error", message: "Forbidden" });
+    }
+
+    const user = await userService.getByIdSafe(uid);
+    if (!user) {
+      return res
+        .status(404)
+        .send({ status: "error", message: "User not found" });
+    }
+    res.send({ status: "success", payload: user });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: error.message });
   }
-  res.send({ status: "success", payload: user });
-}
+};
 
-export async function update(req, res) {
-  const { uid } = req.params;
-  const isSelf = req.user?._id?.toString() === uid;
-  const isAdmin = req.user?.role === "admin";
+// --- Actualizar usuario ---
+export const update = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const isSelf = req.user?._id?.toString() === uid;
+    const isAdmin = req.user?.role === "admin";
 
-  if (!isSelf && !isAdmin) {
-    return res.status(403).send({ status: "error", message: "Forbidden" });
+    if (!isSelf && !isAdmin) {
+      return res.status(403).send({ status: "error", message: "Forbidden" });
+    }
+
+    const { first_name, last_name, age, role } = req.body;
+    const updateData = {};
+
+    if (typeof first_name === "string") updateData.first_name = first_name;
+    if (typeof last_name === "string") updateData.last_name = last_name;
+
+    // Validación de edad
+    if (age !== undefined) {
+      const parsedAge = Number(age);
+      if (!isNaN(parsedAge)) updateData.age = parsedAge;
+    }
+
+    // Solo el admin puede cambiar el rol
+    if (isAdmin && typeof role === "string") updateData.role = role;
+
+    const updated = await userService.update(uid, updateData);
+    if (!updated) {
+      return res
+        .status(404)
+        .send({ status: "error", message: "User not found" });
+    }
+    res.send({ status: "success", payload: updated });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: error.message });
   }
+};
 
-  const { first_name, last_name, age, role } = req.body;
-  const updateData = {};
-  if (typeof first_name === "string") updateData.first_name = first_name;
-  if (typeof last_name === "string") updateData.last_name = last_name;
-  if (typeof age !== "undefined") updateData.age = Number(age);
-  if (isAdmin && typeof role === "string") updateData.role = role;
+// --- Eliminar usuario ---
+export const deleteUser = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    // Asumiendo que solo el admin o el dueño puede borrar
+    // Podrías agregar el chequeo de isAdmin/isSelf aquí también si lo necesitas
 
-  const updated = await userService.update(uid, updateData);
-  if (!updated) {
-    return res.status(404).send({ status: "error", message: "User not found" });
+    const result = await userService.delete(uid);
+    if (result.deletedCount === 0) {
+      return res
+        .status(404)
+        .send({ status: "error", message: "User not found" });
+    }
+    res.send({ status: "success" });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: error.message });
   }
-  res.send({ status: "success", payload: updated });
-}
-
-export async function deleteUser(req, res) {
-  const { uid } = req.params;
-  const result = await userService.delete(uid);
-  if (result.deletedCount === 0) {
-    return res.status(404).send({ status: "error", message: "User not found" });
-  }
-  res.send({ status: "success" });
-}
+};

@@ -35,12 +35,15 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordToken: {
     type: String,
-    require: false,
+    required: false,
   },
   resetPasswordExpires: {
     type: Date,
-    require: false,
+    required: false,
   },
 });
+userSchema.methods.getFullName = function () {
+  return `${this.first_name} ${this.last_name}`;
+};
 
 export const userModel = mongoose.model(userCollection, userSchema);
