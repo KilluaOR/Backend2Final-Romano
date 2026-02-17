@@ -2,7 +2,7 @@ import { cartDAO } from "../dao/cartDBManager.js";
 import { productRepository } from "./product.repository.js";
 
 export const cartRepository = {
-  async getCart(cid) {
+  getCart: async (cid) => {
     const cart = await cartDAO.findById(cid, true);
     if (!cart) {
       throw new Error(`El carrito ${cid} no existe`);
@@ -10,31 +10,25 @@ export const cartRepository = {
     return cart;
   },
 
-  async createCart() {
-    return cartDAO.create();
-  },
+  createCart: async () => cartDAO.create(),
 
-  async addProduct(cid, pid) {
+  addProduct: async (cid, pid) => {
     await productRepository.getById(pid);
     const cart = await cartDAO.findById(cid);
-    if (!cart) {
-      throw new Error(`El carrito ${cid} no existe`);
-    }
+    if (!cart) throw new Error(`El carrito ${cid} no existe`);
     const products = [...cart.products];
     const idx = products.findIndex((item) => item.product.toString() === pid);
-    if (idx >= 0) {
-      products[idx].quantity += 1;
-    } else {
-      products.push({ product: pid, quantity: 1 });
-    }
+    idx >= 0
+      ? (products[idx].quantity += 1)
+      : products.push({ product: pid, quantity: 1 });
+
     return cartDAO.updateProducts(cid, products);
   },
 
-  async updateProduct(cid, pid, quantity) {
+  updateProduct: async (cid, pid, quantity) => {
     const qty = parseInt(quantity, 10);
-    if (isNaN(qty) || qty < 1) {
+    if (isNaN(qty) || qty < 1)
       throw new Error("La cantidad ingresada no es válida");
-    }
     await productRepository.getById(pid);
     const cart = await cartDAO.findById(cid);
     if (!cart) {
