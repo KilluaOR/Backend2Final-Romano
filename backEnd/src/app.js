@@ -29,6 +29,7 @@ import __dirname from "./utils/constantsUtil.js";
 import websocket from "./websocket.js";
 import { initializePassport, jwtSecret } from "./config/passport.config.js";
 import { userService } from "./services/user.service.js";
+import { toUserCurrentDTO } from "./dto/user.dto.js";
 
 const app = express();
 
@@ -131,26 +132,22 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 initializePassport();
 app.use(passport.initialize());
 
-// Middleware para exponer usuario logueado en las vistas (navbar, saludo, etc.)
+// --- MIDDLEWARE DE SESIÓN ---
 app.use(async (req, res, next) => {
-  // Si usamos cookie signing, leer desde signedCookies, sino desde cookies
   const token = req.signedCookies?.jwtCookie || req.cookies?.jwtCookie;
 
-  if (!token) {
-    return next();
-  }
+  if (!token) return next();
 
   try {
     const payload = jwt.verify(token, jwtSecret);
-    const user = await userService.getByIdSafe(payload.id);
+    const userDoc = await userService.getByIdSafe(payload.id);
 
-    if (user) {
-      res.locals.user = user;
+    if (userDoc) {
+      res.locals.user = toUserCurrentDTO(userDoc);
     }
   } catch (error) {
-    // si el token es inválido o expiró, simplemente seguimos sin user
+    console.error("JWT Verify error:", error.message);
   }
-
   next();
 });
 

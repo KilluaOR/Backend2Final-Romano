@@ -5,48 +5,24 @@ import { userService } from "../services/user.service.js";
 
 // --- Registro ---
 export const registerCallback = (req, res, err, user, info) => {
-  if (err) {
+  if (err || !user) {
     console.error("Register error:", err);
-    const message =
-      err.code === 11000
-        ? "El email ya está registrado"
-        : err.message || "Error al registrar";
-    return res.status(500).json({ status: "error", message });
-  }
-
-  if (!user) {
     return res.status(400).json({
       status: "error",
-      message: info?.message || "No se pudo crear el usuario",
+      message: info?.message || err?.message || "Error al registrar",
     });
   }
-
-  console.log("Usuario registrado:", user.email, "| id:", user._id.toString());
 
   res.status(201).send({
     status: "success",
     message: "Usuario registrado correctamente",
-    payload: {
-      id: user._id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      age: user.age,
-      role: user.role,
-    },
+    payload: toUserCurrentDTO(user),
   });
 };
 
 // --- Login ---
 export const loginCallback = (req, res, err, user, info) => {
-  if (err) {
-    return res.status(500).json({
-      status: "error",
-      message: err.message || "Error al iniciar sesión",
-    });
-  }
-
-  if (!user) {
+  if (err || !user) {
     return res.status(401).json({
       status: "error",
       message: info?.message || "Credenciales inválidas",
@@ -54,7 +30,7 @@ export const loginCallback = (req, res, err, user, info) => {
   }
 
   const token = jwt.sign(
-    { id: user._id, email: user.email, role: user.role },
+    { id: user._id, email: user.email, role: user.role, cart: user.cart },
     jwtSecret,
     { expiresIn: "1h" },
   );
@@ -65,25 +41,19 @@ export const loginCallback = (req, res, err, user, info) => {
     signed: !!process.env.COOKIE_SECRET,
   };
 
-  res
-    .cookie("jwtCookie", token, cookieOptions)
-    .send({ status: "success", message: "Login exitoso" });
+  res.cookie("jwtCookie", token, cookieOptions).send({
+    status: "success",
+    message: "Login exitoso",
+    payload: toUserCurrentDTO(user),
+  });
 };
 
 // --- Current User ---
 export const currentCallback = (req, res, err, user, info) => {
-  if (err) {
-    return res.status(500).json({
-      status: "error",
-      message: err.message || "Error de autenticación",
-    });
-  }
-
-  if (!user) {
+  if (err || !user) {
     return res.status(401).json({
       status: "error",
-      message:
-        info?.message || "Token inválido o expirado. Iniciá sesión nuevamente.",
+      message: info?.message || "Sesión expirada. Inicie sesión nuevamente.",
     });
   }
 
@@ -112,8 +82,8 @@ export const forgotPassword = async (req, res) => {
       message:
         "Si el email existe, recibirás un enlace para restablecer la contraseña.",
     });
-  } catch {
-    res.status(400).json({
+  } catch (error) {
+    res.status(200).json({
       status: "success",
       message:
         "Si el email existe, recibirás un enlace para restablecer la contraseña.",
@@ -122,5 +92,21 @@ export const forgotPassword = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-  // Lógica pendiente
+  try {
+    const { token, password } = req.body;
+    if (!token || !password)
+      throw new Error("Token y contraseña son requeridos");
+
+    await userService.resetPassword(token, password);
+
+    res.send({
+      status: "success",
+      message: "Contraseña actualizada correctamente",
+    });
+  } catch (error) {
+    res.status(400).send({
+      status: "error",
+      message: error.message,
+    });
+  }
 };

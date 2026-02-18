@@ -10,4 +10,5 @@ export const cartService = {
     cartRepository.updateAllProducts(cid, products),
   deleteProduct: (cid, pid) => cartRepository.deleteProduct(cid, pid),
   emptyCart: (cid) => cartRepository.emptyCart(cid),
+  purchase: (cid, userEmail) => cartRepository.purchase(cid, userEmail),
 };
