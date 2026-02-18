@@ -1,44 +1,30 @@
 import { Router } from "express";
 import passport from "passport";
+import { requireAdmin } from "../middlewares/authorization.middleware.js";
 import { uploader } from "../utils/multerUtil.js";
-
 import {
-  create,
-  deleteProduct,
   getAll,
   getById,
+  create,
   update,
+  deleteProduct,
 } from "../controllers/product.controller.js";
-import { requireAdmin } from "../middlewares/authorization.middleware.js";
 
 const router = Router();
+const authJWT = passport.authenticate("jwt", { session: false });
 
 router.get("/", getAll);
 
 router.get("/:pid", getById);
 
-//Solo si el usuario está logeado y es admin se ejecuta el upload y create.
-router.post(
-  "/",
-  passport.authenticate("current", { session: false }),
-  requireAdmin,
-  uploader.array("thumbnails", 3),
-  create,
-);
-
+router.post("/", authJWT, requireAdmin, uploader.array("thumbnails"), create);
 router.put(
   "/:pid",
-  passport.authenticate("current", { session: false }),
+  authJWT,
   requireAdmin,
-  uploader.array("thumbnails", 3),
+  uploader.array("thumbnails"),
   update,
 );
-
-router.delete(
-  "/:pid",
-  passport.authenticate("current", { session: false }),
-  requireAdmin,
-  deleteProduct,
-);
+router.delete("/:pid", authJWT, requireAdmin, deleteProduct);
 
 export default router;

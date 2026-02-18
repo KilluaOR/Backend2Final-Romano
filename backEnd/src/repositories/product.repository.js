@@ -1,10 +1,10 @@
 import { productDAO } from "../dao/productDBManager.js";
 
 export const productRepository = {
-  async getAll(params) {
+  getAll: async (params) => {
     const page = params?.page ? parseInt(params.page) : 1;
     const limit = params?.limit ? parseInt(params.limit) : 10;
-    const options = { page, limit };
+    const options = { page, limit, lean: true };
     if (params?.sort === "asc" || params?.sort === "desc") {
       options.sort = { price: params.sort };
     }
@@ -12,42 +12,31 @@ export const productRepository = {
     let filter = {};
     if (params?.query) {
       const q = params.query;
-      if (q === "true" || q === "false") {
-        filter.status = q === "true";
-      } else {
-        filter.category = q;
-      }
+      q === "true" || q === "false"
+        ? (filter.status = q === "true")
+        : (filter.category = q);
     }
 
     const result = await productDAO.findPaginated(filter, options);
 
+    const baseUrl = `/products?limit=${limit}${params?.sort ? `&sort=${params.sort}` : ""}`;
     result.prevLink = result.hasPrevPage
-      ? `/products?page=${result.prevPage}`
+      ? `${baseUrl}&page=${result.prevPage}`
       : null;
     result.nextLink = result.hasNextPage
-      ? `/products?page=${result.nextPage}`
+      ? `${baseUrl}&page=${result.nextPage}`
       : null;
-    if (limit !== 10) {
-      if (result.prevLink) result.prevLink += `&limit=${limit}`;
-      if (result.nextLink) result.nextLink += `&limit=${limit}`;
-    }
-    if (params?.sort) {
-      if (result.prevLink) result.prevLink += `&sort=${params.sort}`;
-      if (result.nextLink) result.nextLink += `&sort=${params.sort}`;
-    }
 
     return result;
   },
 
-  async getById(pid) {
+  getById: async (pid) => {
     const product = await productDAO.findById(pid);
-    if (!product) {
-      throw new Error(`El producto ${pid} no existe`);
-    }
+    if (!product) throw new Error(`El producto ${pid} no existe`);
     return product;
   },
 
-  async create(productData) {
+  create: async (productData) => {
     const {
       title,
       description,
@@ -61,32 +50,20 @@ export const productRepository = {
     if (!title || !description || !code || !price || !stock || !category) {
       throw new Error("Faltan campos requeridos para crear el producto");
     }
-    return productDAO.create({
-      title,
-      description,
-      code,
-      price,
-      stock,
-      category,
-      thumbnails: thumbnails ?? [],
-      status: status ?? true,
-    });
+    return productDAO.create(productData);
   },
 
-  async update(pid, productUpdate) {
-    const product = await productDAO.findById(pid);
-    if (!product) {
-      throw new Error(`El producto ${pid} no existe`);
-    }
+  update: async (pid, productUpdate) => {
+    const exists = await productDAO.findById(pid);
+    if (!exists) throw new Error(`El producto ${pid} no existe`);
     await productDAO.update(pid, productUpdate);
     return productDAO.findById(pid);
   },
 
-  async delete(pid) {
+  delete: async (pid) => {
     const result = await productDAO.delete(pid);
-    if (result.deletedCount === 0) {
+    if (result.deletedCount === 0)
       throw new Error(`El producto ${pid} no existe`);
-    }
     return result;
   },
 };

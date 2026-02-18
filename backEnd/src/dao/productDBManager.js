@@ -1,27 +1,23 @@
-import productModel from "./models/productModel.js";
+import { productModel } from "./models/productModel.js";
 
-class ProductDAO {
-  async findPaginated(filter, options) {
-    return productModel.paginate(filter, options);
-  }
+export const ProductDAO = {
+  findPaginated: async (filter, options) => {
+    return await productModel.paginate(filter, options);
+  },
 
-  async findById(pid) {
-    const product = await productModel.findOne({ _id: pid });
-    return product ?? null;
-  }
+  findById: async (pid) => {
+    return (await productModel.findOne({ _id: pid }).lean()) ?? null;
+  },
 
-  async create(data) {
-    return productModel.create(data);
-  }
+  create: async (data) => {
+    return await productModel.create(data);
+  },
 
-  async update(pid, data) {
-    return productModel.updateOne({ _id: pid }, data);
-  }
+  update: async (pid, data) => {
+    return await productModel.updateOne({ _id: pid }, data);
+  },
 
-  async delete(pid) {
-    return productModel.deleteOne({ _id: pid });
-  }
-}
-
-const productDAO = new ProductDAO();
-export { ProductDAO, productDAO };
+  delete: async (pid) => {
+    return await productModel.deleteOne({ _id: pid });
+  },
+};
