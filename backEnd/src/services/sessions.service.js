@@ -1,16 +1,27 @@
 import { userService } from "./user.service.js";
 
 export const sessionsService = {
-  getByEmail(email) {
-    return userService.getByEmail(email);
+  // Para el login: buscamos al usuario por email
+  login: async (email) => {
+    return await userService.getByEmail(email);
   },
-  register(data) {
-    return userService.register(data);
+
+  // Para el registro: delegamos la creación
+  register: async (userData) => {
+    return await userService.register(userData);
   },
-  requestPasswordReset(email) {
-    return userService.requestPasswordReset(email);
+
+  // Lógica de recuperación de contraseña
+  requestPasswordReset: async (email) => {
+    return await userService.requestPasswordReset(email);
   },
-  resetPassword(token, newPassword) {
-    return userService.resetPassword(token, newPassword);
+
+  resetPassword: async (token, newPassword) => {
+    return await userService.resetPassword(token, newPassword);
+  },
+
+  // Método extra que podrías necesitar para el "current"
+  getCurrentUser: async (id) => {
+    return await userService.getByIdSafe(id);
   },
 };

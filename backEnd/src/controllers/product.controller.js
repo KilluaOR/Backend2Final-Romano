@@ -13,6 +13,8 @@ export const getAll = async (req, res) => {
       page: result.page,
       hasPrevPage: result.hasPrevPage,
       hasNextPage: result.hasNextPage,
+      prevLink: result.prevLink,
+      nextLink: result.nextLink,
     });
   } catch (error) {
     res.status(500).send({ status: "error", message: error.message });
@@ -75,7 +77,7 @@ export const update = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const result = await productService.deleteProduct(req.params.pid);
+    const result = await productService.delete(req.params.pid);
     res.send({
       status: "success",
       payload: result,

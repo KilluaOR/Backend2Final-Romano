@@ -5,8 +5,9 @@ export const productRepository = {
     const page = params?.page ? parseInt(params.page) : 1;
     const limit = params?.limit ? parseInt(params.limit) : 10;
     const options = { page, limit, lean: true };
+
     if (params?.sort === "asc" || params?.sort === "desc") {
-      options.sort = { price: params.sort };
+      options.sort = { price: params.sort === "asc" ? 1 : -1 };
     }
 
     let filter = {};
@@ -37,16 +38,7 @@ export const productRepository = {
   },
 
   create: async (productData) => {
-    const {
-      title,
-      description,
-      code,
-      price,
-      stock,
-      category,
-      thumbnails,
-      status,
-    } = productData;
+    const { title, description, code, price, stock, category } = productData;
     if (!title || !description || !code || !price || !stock || !category) {
       throw new Error("Faltan campos requeridos para crear el producto");
     }
@@ -54,16 +46,16 @@ export const productRepository = {
   },
 
   update: async (pid, productUpdate) => {
-    const exists = await productDAO.findById(pid);
-    if (!exists) throw new Error(`El producto ${pid} no existe`);
-    await productDAO.update(pid, productUpdate);
-    return productDAO.findById(pid);
+    const updatedProduct = await productDAO.update(pid, productUpdate);
+    if (!updatedProduct) throw new Error(`El producto ${pid} no existe`);
+    return updatedProduct;
   },
 
   delete: async (pid) => {
     const result = await productDAO.delete(pid);
-    if (result.deletedCount === 0)
-      throw new Error(`El producto ${pid} no existe`);
+    if (!result || result.deletedCount === 0) {
+      throw new Error(`No se pudo eliminar: el producto ${pid} no existe`);
+    }
     return result;
   },
 };

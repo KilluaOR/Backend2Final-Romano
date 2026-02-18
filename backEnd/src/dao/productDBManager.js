@@ -13,8 +13,8 @@ export const ProductDAO = {
     return await productModel.create(data);
   },
 
-  update: async (pid, data) => {
-    return await productModel.updateOne({ _id: pid }, data);
+  update: async (id, data) => {
+    return await productModel.findByIdAndUpdate(id, data, { new: true }).lean();
   },
 
   delete: async (pid) => {

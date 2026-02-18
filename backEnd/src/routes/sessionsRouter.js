@@ -5,28 +5,33 @@ import {
   loginCallback,
   currentCallback,
   logout,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/sessions.controller.js";
 
 const router = Router();
 
-router.post("/register", (req, res, next) => {
-  passport.authenticate("register", { session: false }, (err, user, info) => {
-    registerCallback(req, res, err, user, info);
-  })(req, res, next);
-});
+const passportCall = (strategy) => {
+  return (req, res, next) => {
+    passport.authenticate(strategy, { session: false }, (err, user, info) => {
+      if (strategy === "register")
+        return registerCallback(req, res, err, user, info);
+      if (strategy === "login") return loginCallback(req, res, err, user, info);
+      if (strategy === "current")
+        return currentCallback(req, res, err, user, info);
+      next();
+    })(req, res, next);
+  };
+};
 
-router.post("/login", (req, res, next) => {
-  passport.authenticate("login", { session: false }, (err, user, info) => {
-    loginCallback(req, res, err, user, info);
-  })(req, res, next);
-});
+// Rutas de Autenticación
+router.post("/register", passportCall("register"));
+router.post("/login", passportCall("login"));
+router.get("/current", passportCall("current"));
 
-router.get("/current", (req, res, next) => {
-  passport.authenticate("current", { session: false }, (err, user, info) => {
-    currentCallback(req, res, err, user, info);
-  })(req, res, next);
-});
-
+// Rutas de sesión y recuperación
 router.post("/logout", logout);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 export default router;
