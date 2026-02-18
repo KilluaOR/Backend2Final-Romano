@@ -12,49 +12,35 @@ import {
 } from "../controllers/cart.controller.js";
 
 const router = Router();
+const authenticate = passport.authenticate("current", { session: false });
 
-router.get(
-  "/:cid",
-  passport.authenticate("current", { session: false }),
-  requireUserCart,
-  getProductsFromCartByID,
-);
+router.get("/:cid", authenticate, requireUserCart, getProductsFromCartByID);
 
 router.post("/", createCart);
 
 router.post(
   "/:cid/products/:pid",
-  passport.authenticate("current", { session: false }),
+  authenticate,
   requireUserCart,
   addProductByID,
 );
 
 router.delete(
   "/:cid/products/:pid",
-  passport.authenticate("current", { session: false }),
+  authenticate,
   requireUserCart,
   deleteProductByID,
 );
 
-router.put(
-  "/:cid",
-  passport.authenticate("current", { session: false }),
-  requireUserCart,
-  updateAllProducts,
-);
+router.put("/:cid", authenticate, requireUserCart, updateAllProducts);
 
 router.put(
   "/:cid/product/:pid",
-  passport.authenticate("current", { session: false }),
+  authenticate,
   requireUserCart,
   updateProductByID,
 );
 
-router.delete(
-  "/:cid",
-  passport.authenticate("current", { session: false }),
-  requireUserCart,
-  deleteAllProducts,
-);
+router.delete("/:cid", authenticate, requireUserCart, deleteAllProducts);
 
 export default router;

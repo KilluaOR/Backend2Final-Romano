@@ -4,9 +4,7 @@ import { productRepository } from "./product.repository.js";
 export const cartRepository = {
   getCart: async (cid) => {
     const cart = await cartDAO.findById(cid, true);
-    if (!cart) {
-      throw new Error(`El carrito ${cid} no existe`);
-    }
+    if (!cart) throw new Error(`El carrito ${cid} no existe`);
     return cart;
   },
 
@@ -47,7 +45,7 @@ export const cartRepository = {
     return cartDAO.updateProducts(cid, products);
   },
 
-  async updateAllProducts(cid, products) {
+  updateAllProducts: async (cid, products) => {
     for (const item of products) {
       await productRepository.getById(item.product);
     }
@@ -58,23 +56,21 @@ export const cartRepository = {
     return cartDAO.updateProducts(cid, products);
   },
 
-  async deleteProduct(cid, pid) {
+  deleteProduct: async (cid, pid) => {
     await productRepository.getById(pid);
     const cart = await cartDAO.findById(cid);
-    if (!cart) {
-      throw new Error(`El carrito ${cid} no existe`);
-    }
+    if (!cart) throw new Error(`El carrito ${cid} no existe`);
+
     const products = cart.products.filter(
       (item) => item.product.toString() !== pid,
     );
     return cartDAO.updateProducts(cid, products);
   },
 
-  async emptyCart(cid) {
+  emptyCart: async (cid) => {
     const cart = await cartDAO.findById(cid);
-    if (!cart) {
-      throw new Error(`El carrito ${cid} no existe`);
-    }
+    if (!cart) throw new Error(`El carrito ${cid} no existe`);
+
     return cartDAO.updateProducts(cid, []);
   },
 };

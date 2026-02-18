@@ -1,6 +1,6 @@
 import { cartModel } from "./models/cartModel.js";
 
-export const CartDAO = {
+export const cartDAO = {
   findById: async (cid, populate = false) => {
     const query = cartModel.findOne({ _id: cid });
     if (populate) {
