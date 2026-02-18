@@ -1,5 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
+import rateLimit from "express-rate-limit";
 import {
   registerCallback,
   loginCallback,
@@ -10,6 +11,15 @@ import {
 } from "../controllers/sessions.controller.js";
 
 const router = Router();
+
+const mailLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3, // Máximo 3 intentos de recuperación por IP
+  message: "Demasiados intentos de correo, intente más tarde.",
+});
+
+// Aplicar solo a las rutas que envían mails
+router.post("/forgot-password", mailLimiter, forgotPassword);
 
 const passportCall = (strategy) => {
   return (req, res, next) => {
@@ -31,7 +41,7 @@ router.get("/current", passportCall("current"));
 
 // Rutas de sesión y recuperación
 router.post("/logout", logout);
-router.post("/forgot-password", forgotPassword);
+router.post("/forgot-password", mailLimiter, forgotPassword);
 router.post("/reset-password", resetPassword);
 
 export default router;
