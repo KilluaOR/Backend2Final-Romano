@@ -125,7 +125,7 @@ app.set("view engine", "handlebars");
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
+app.use(express.static(path.join(projectRoot, "public")));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // Passport

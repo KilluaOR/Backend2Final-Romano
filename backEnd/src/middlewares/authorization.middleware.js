@@ -3,24 +3,22 @@ export const ROLES = {
   USER: "user",
 };
 
-export const requireRole =
-  (...allowedRoles) =>
-  (req, res, next) => {
-    return (req, res, next) => {
-      if (!req.user) {
-        return res
-          .status(401)
-          .json({ status: "error", message: "No autorizado" });
-      }
-      if (!allowedRoles.includes(req.user.role)) {
-        return res.status(403).json({
-          status: "error",
-          message: "No tiene el rol necesario para esta acción",
-        });
-      }
-      next();
-    };
+export const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "No autorizado" });
+    }
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        status: "error",
+        message: "No tiene el rol necesario para esta acción",
+      });
+    }
+    next();
   };
+};
 
 export const requireAdmin = requireRole(ROLES.ADMIN);
 
