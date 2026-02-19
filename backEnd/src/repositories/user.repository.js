@@ -1,4 +1,5 @@
 import { userDAO } from "../dao/userDBManager.js";
+import { mailingService } from "../services/mailing.service.js";
 import { createHash, isValidPassword } from "../utils/bcryptUtil.js";
 import { cartRepository } from "./cart.repository.js";
 import crypto from "crypto";
@@ -42,10 +43,15 @@ export const userRepository = {
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
     await userDAO.setResetToken(user.email, token, expiresAt);
+
+    await mailingService.sendMail({
+      to: user.email,
+      subject: "Restablecer contraseña",
+      html: `<h1> Usa este topken para resetear tu clave:</h1><p]>${token}</p>`,
+    });
     return {
       success: true,
-      message:
-        "Enlace enviado",
+      message: "Enlace enviado",
     };
   },
 

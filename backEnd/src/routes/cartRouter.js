@@ -9,10 +9,13 @@ import {
   getProductsFromCartByID,
   updateAllProducts,
   updateProductByID,
+  purchase,
 } from "../controllers/cart.controller.js";
 
 const router = Router();
 const authenticate = passport.authenticate("current", { session: false });
+
+router.post("/:cid/purchase", authenticate, requireUserCart, purchase);
 
 router.get("/:cid", authenticate, requireUserCart, getProductsFromCartByID);
 

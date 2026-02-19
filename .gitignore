@@ -1,6 +1,10 @@
-**/node_modules
-**/package-lock.json
-/public/img/**
-products.json
-carts.json
+# Dependencias
+node_modules/
+
+# Configuración personal y seguridad
 .env
+.DS_Store
+Thumbs.db
+
+# Logs y archivos temporales
+npm-debug.log*

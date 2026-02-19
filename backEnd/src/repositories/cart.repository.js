@@ -1,6 +1,7 @@
 import { cartDAO } from "../dao/cartDBManager.js";
 import { productDAO } from "../dao/productDBManager.js"; // REQUISITO: DAO para peticiones asíncronas
 import { ticketDAO } from "../dao/ticketDBManager.js"; // REQUISITO: Tickets en repository
+import { mailingService } from "../services/mailing.service.js";
 import { productRepository } from "./product.repository.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -73,25 +74,22 @@ export const cartRepository = {
     return cartDAO.updateProducts(cid, []);
   },
 
-  // --- NUEVO MÉTODO PURCHASE (Cumpliendo criterios del profesor) ---
+  // --- NUEVO MÉTODO PURCHASE ---
   purchase: async (cid, userEmail) => {
-    const cart = await cartDAO.findById(cid, true); // Populate para ver el stock
+    const cart = await cartDAO.findById(cid, true);
     if (!cart) throw new Error("Carrito no encontrado");
 
     const failedProducts = [];
     let totalAmount = 0;
 
-    // REQUISITO: Usar for...of (asíncrono) en lugar de forEach
     for (const item of cart.products) {
-      const productDB = await productDAO.findById(item.product._id); // Petición asíncrona vía DAO
+      const productDB = await productDAO.findById(item.product._id);
 
       if (productDB && productDB.stock >= item.quantity) {
-        // Si hay stock, restamos
         productDB.stock -= item.quantity;
         await productDAO.update(productDB._id, { stock: productDB.stock });
         totalAmount += productDB.price * item.quantity;
       } else {
-        // REQUISITO: Si no hay stock, el ID debe quedar para el carrito
         failedProducts.push({
           product: item.product._id,
           quantity: item.quantity,
@@ -101,7 +99,6 @@ export const cartRepository = {
 
     let ticket = null;
     if (totalAmount > 0) {
-      // REQUISITO: Creación de ticket en Repository
       ticket = await ticketDAO.create({
         code: uuidv4(),
         amount: totalAmount,
@@ -109,8 +106,20 @@ export const cartRepository = {
       });
     }
 
-    // REQUISITO: El carrito se actualiza con lo que NO se pudo comprar
     await cartDAO.updateProducts(cid, failedProducts);
+
+    if (ticket) {
+      await mailingService.sendMail({
+        to: userEmail,
+        subjkect: "Ticket de Compra - Killu Store",
+        html: `
+        <h1>¡Gracias por tu compra!</h1>
+        <p>Código de ticket: <strong>${ticket.code}</strong></p>
+        <p>Total abonado: $${ticket.amount}</p>
+        <p>Fecha: ${ticket.purchase_datetime}</p>
+        `,
+      });
+    }
 
     return {
       ticket,
