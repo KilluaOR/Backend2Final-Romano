@@ -99,13 +99,15 @@ async function connectDB() {
   }
 }
 
-//Handlebars Config
+// --- Handlebars Config ---
+const viewsPath = path.join(__dirnameApp, "views");
+
 app.engine(
   "handlebars",
   handlebars.engine({
     defaultLayout: "main",
-    layoutsDir: __dirname + "/../views/layouts",
-    partialsDir: __dirname + "/../views/partials",
+    layoutsDir: path.join(viewsPath, "layouts"),
+    partialsDir: path.join(viewsPath, "partials"),
     helpers: {
       multiply: (a, b) => Number(a ?? 0) * Number(b ?? 0),
       cartTotal: (products) => {
@@ -116,16 +118,17 @@ app.engine(
           return acc + price * qty;
         }, 0);
       },
+      isAdmin: (role) => role === "admin",
     },
   }),
 );
-app.set("views", __dirname + "/../views");
-app.set("view engine", "handlebars");
 
-//Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(projectRoot, "public")));
+app.set("views", viewsPath);
+app.set("view engine", "handlebars");
+app.set("view cache", false);
+
+app.use(express.static(path.join(__dirnameApp, "..", "public", "frontEnd")));
+
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // Passport
@@ -150,6 +153,9 @@ app.use(async (req, res, next) => {
   }
   next();
 });
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //Routers
 app.use("/api/products", productRouter);

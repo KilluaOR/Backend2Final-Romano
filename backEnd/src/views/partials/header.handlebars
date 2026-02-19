@@ -16,27 +16,35 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       {{#if user}}
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex" style="gap: 1rem;">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Inicio</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/realtimeproducts">Lista de productos en tiempo real</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/products">Productos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/cart/{{user.cart}}" id="cart-link">Carrito</a>
-        </li>
-      </ul>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex" style="gap: 1rem;">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Inicio</a>
+          </li>
+          {{#if (isAdmin user.role)}}
+            <li class="nav-item">
+              <a class="nav-link" href="/realtimeproducts">Lista de productos en
+                tiempo real</a>
+            </li>
+          {{/if}}
+          <li class="nav-item">
+            <a class="nav-link" href="/products">Productos</a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="/cart/{{user.cart}}"
+              id="cart-link"
+            >Carrito</a>
+          </li>
+        </ul>
       {{/if}}
 
       <div class="d-flex align-items-center gap-2">
         {{#if user}}
           <span class="navbar-text m-0">Hola {{user.first_name}}</span>
           <form action="/api/sessions/logout" method="POST" class="m-0">
-            <button class="btn btn-outline-danger btn-sm" type="submit">Cerrar sesión</button>
+            <button class="btn btn-outline-danger btn-sm" type="submit">Cerrar
+              sesión</button>
           </form>
         {{else}}
           <a class="btn btn-outline-primary btn-sm" href="/login">Login</a>
@@ -46,4 +54,3 @@
     </div>
   </div>
 </nav>
-

@@ -9,8 +9,21 @@ const requireAuth = (req, res, next) => {
   next();
 };
 
+const isAdmin = (req, res, next) => {
+  if (res.locals.user && res.locals.user.role === "admin") {
+    return next();
+  }
+  res.redirect("/products");
+};
+
 router.get("/login", viewsController.getLogin);
 router.get("/register", viewsController.getRegister);
+router.get(
+  "/realtimeproducts",
+  requireAuth,
+  isAdmin,
+  viewsController.getRealTimeProducts,
+);
 
 router.get("/", requireAuth, viewsController.getHome);
 router.get("/products", requireAuth, viewsController.getProductsList);

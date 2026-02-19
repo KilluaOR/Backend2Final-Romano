@@ -1,9 +1,8 @@
 import { cartDAO } from "../dao/cartDBManager.js";
-import { productDAO } from "../dao/productDBManager.js"; // REQUISITO: DAO para peticiones asíncronas
-import { ticketDAO } from "../dao/ticketDBManager.js"; // REQUISITO: Tickets en repository
+import { productDAO } from "../dao/productDBManager.js";
+import { ticketDAO } from "../dao/ticketDBManager.js";
 import { mailingService } from "../services/mailing.service.js";
 import { productRepository } from "./product.repository.js";
-import { v4 as uuidv4 } from "uuid";
 
 export const cartRepository = {
   getCart: async (cid) => {
@@ -115,7 +114,7 @@ export const cartRepository = {
       });
 
       const productosHTML = successfulProducts
-        .map((p) => `<li>${p.title} x ${p.quantity} - $${subtotal}</li>`)
+        .map((p) => `<li>${p.title} x ${p.quantity} - $${p.subtotal}</li>`)
         .join("");
 
       await mailingService.sendMail({

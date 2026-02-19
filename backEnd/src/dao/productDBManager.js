@@ -1,6 +1,6 @@
 import { productModel } from "./models/productModel.js";
 
-export const ProductDAO = {
+export const productDAO = {
   findPaginated: async (filter, options) => {
     return await productModel.paginate(filter, options);
   },

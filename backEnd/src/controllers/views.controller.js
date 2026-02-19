@@ -25,6 +25,7 @@ export const getHome = (req, res) => {
   res.render("home", {
     title: "Inicio",
     style: "index.css",
+    user: res.locals.user,
   });
 };
 
@@ -66,6 +67,7 @@ export const getRealTimeProducts = async (req, res) => {
     title: "Productos",
     style: "index.css",
     products: JSON.parse(JSON.stringify(products.docs)),
+    user: res.locals.user,
   });
 };
 
@@ -77,6 +79,7 @@ export const getCartDetail = async (req, res) => {
       style: "index.css",
       cid: req.params.cid,
       products: JSON.parse(JSON.stringify(response.products)),
+      user: res.locals.user,
     });
   } catch (error) {
     res.status(404).render("notFound", {
