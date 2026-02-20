@@ -11,20 +11,26 @@ import {
 } from "../controllers/product.controller.js";
 
 const router = Router();
-const authJWT = passport.authenticate("jwt", { session: false });
+const authenticate = passport.authenticate("jwt", { session: false });
 
 router.get("/", getAll);
 
 router.get("/:pid", getById);
 
-router.post("/", authJWT, requireAdmin, uploader.array("thumbnails"), create);
+router.post(
+  "/",
+  authenticate,
+  requireAdmin,
+  uploader.array("thumbnails"),
+  create,
+);
 router.put(
   "/:pid",
-  authJWT,
+  authenticate,
   requireAdmin,
   uploader.array("thumbnails"),
   update,
 );
-router.delete("/:pid", authJWT, requireAdmin, deleteProduct);
+router.delete("/:pid", authenticate, requireAdmin, deleteProduct);
 
 export default router;

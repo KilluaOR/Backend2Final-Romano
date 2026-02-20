@@ -1,6 +1,9 @@
 import { Router } from "express";
 import passport from "passport";
-import { requireUserCart } from "../middlewares/authorization.middleware.js";
+import {
+  requireUser,
+  requireUserCart,
+} from "../middlewares/authorization.middleware.js";
 import {
   addProductByID,
   createCart,
@@ -15,7 +18,13 @@ import {
 const router = Router();
 const authenticate = passport.authenticate("current", { session: false });
 
-router.post("/:cid/purchase", authenticate, requireUserCart, purchase);
+router.post(
+  "/:cid/purchase",
+  authenticate,
+  requireUser,
+  requireUserCart,
+  purchase,
+);
 
 router.get("/:cid", authenticate, requireUserCart, getProductsFromCartByID);
 
@@ -24,6 +33,7 @@ router.post("/", createCart);
 router.post(
   "/:cid/product/:pid",
   authenticate,
+  requireUser,
   requireUserCart,
   addProductByID,
 );
