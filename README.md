@@ -31,6 +31,33 @@ Para probar rutas de administrador (Crear/Editar productos), modifique el campo 
 
 Nota: Tras cambiar el rol en la DB, debe cerrar sesión y volver a loguearse para renovar el JWT de la cookie.
 
+🔑 Sistema de Recuperación de Contraseña (Avanzado)
+Se ha implementado un flujo de seguridad completo para la recuperación de credenciales, cumpliendo con los requerimientos de persistencia y seguridad:
+
+Generación de Tokens Opacos: A diferencia de un JWT común, se utilizan tokens únicos generados con la librería crypto, almacenados en la base de datos con una validez de 1 hora.
+
+Seguridad contra Enumeración: El endpoint de solicitud responde con un mensaje ambiguo ("Si el email existe...") para evitar que atacantes descubran correos electrónicos registrados.
+
+Protección de Fuerza Bruta: Se integró un Rate Limiter que bloquea las solicitudes de recuperación tras 3 intentos fallidos desde una misma IP por un periodo de 15 minutos.
+
+Validación de Historial: El sistema utiliza bcrypt para comparar la nueva contraseña con la almacenada. Se impide estrictamente que el usuario restablezca su cuenta con la misma contraseña que ya poseía.
+
+Manejo de Expiración: Si el token ha caducado o ya ha sido utilizado, el sistema invalida la operación y solicita al usuario iniciar un nuevo proceso de recuperación.
+
+🚀 Cómo probarlo
+Haga un POST a /api/sessions/forgot-password enviando un JSON con un "email" real.
+
+Copie el token recibido en su bandeja de entrada (o consola).
+
+Haga un POST a /api/sessions/reset-password enviando:
+
+JSON
+{
+"token": "TOKEN_RECIBIDO",
+"password": "NUEVA_PASSWORD"
+}
+Verifique el error intentando usar su contraseña actual o un token expirado.
+
 🛠️ Arquitectura y Patrones Aplicados
 DAO (Data Access Object): Capa de persistencia desacoplada para modelos de MongoDB.
 

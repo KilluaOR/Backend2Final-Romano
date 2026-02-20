@@ -47,7 +47,7 @@ export const userRepository = {
     await mailingService.sendMail({
       to: user.email,
       subject: "Restablecer contraseña",
-      html: `<h1> Usa este topken para resetear tu clave:</h1><p]>${token}</p>`,
+      html: `<h1> Usa este token para resetear tu clave:</h1><p]>${token}</p>`,
     });
     return {
       success: true,
@@ -57,14 +57,20 @@ export const userRepository = {
 
   resetPassword: async (token, newPassword) => {
     const user = await userDAO.findByResetToken(token);
-    if (!user) {
-      return { success: false, message: "Token inválido o expirado" };
+
+    if (!user || user.resetPasswordExpires < new Date()) {
+      throw new Error("El token es inválido o ha expirado");
     }
+
     if (isValidPassword(user, newPassword)) {
-      return { success: false, message: "No puedes usar la misma contraseña" };
+      throw new Error("No puedes usar la misma contraseña anterior");
     }
+
     const hashedPassword = createHash(newPassword);
     await userDAO.updatePassword(user._id, hashedPassword);
-    return { success: true, message: "Contraseña actualizada" };
+
+    await userDAO.setResetToken(user.email, null, null);
+
+    return { success: true };
   },
 };
