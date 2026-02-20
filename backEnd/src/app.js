@@ -1,6 +1,6 @@
+import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import dotenv from "dotenv";
 import express from "express";
 import handlebars from "express-handlebars";
 import { Server } from "socket.io";
@@ -105,13 +105,9 @@ if (!process.env.MONGO_URI) {
 
 async function connectDB() {
   try {
-    // 1. Limpiamos la URI para el log (por seguridad)
     const uriForLog = uri.includes("@") ? uri.replace(/:(.*)@/, ":***@") : uri;
     console.log("🔗 Intentando conectar a MongoDB:", uriForLog);
 
-    // 2. Conexión con opciones modernas
-    // Nota: useNewUrlParser y useUnifiedTopology ya no son necesarios en drivers nuevos,
-    // pero el timeout sí es vital.
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000,
     });
@@ -122,7 +118,6 @@ async function connectDB() {
   } catch (error) {
     console.error("❌ Error en la conexión a MongoDB:");
 
-    // Switch de errores comunes para darte pistas claras
     if (
       error.message.includes("ETIMEOUT") ||
       error.message.includes("selection timeout")
@@ -138,8 +133,6 @@ async function connectDB() {
       console.error(`   → ${error.message}`);
     }
 
-    // En desarrollo, quizás no quieras que el proceso muera al primer intento
-    // pero para la entrega final, es mejor cerrar si no hay DB.
     process.exit(1);
   }
 }

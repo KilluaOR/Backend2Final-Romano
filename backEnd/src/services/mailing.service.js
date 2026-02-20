@@ -1,12 +1,13 @@
 import nodemailer from "nodemailer";
 
+console.log("Configurando mail con:", process.env.MAIL_USER);
 //Transporte con protocolo SMPT
-const transport = nodemailer.createTransport({
+export const transport = nodemailer.createTransport({
   service: "gmail",
   port: 587,
   auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
+    user: `orneroma@gmail.com`,
+    pass: `amxj ajya xtnc aaih`,
   },
 });
 

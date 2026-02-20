@@ -5,9 +5,9 @@ export default (io) => {
   io.on("connection", (socket) => {
     socket.on("createProduct", async (data) => {
       try {
-        await ProductService.createProduct(data);
-        const products = await ProductService.getAllProducts({});
-        socket.emit("publishProducts", products.docs);
+        await ProductService.create(data);
+        const products = await ProductService.getAll({});
+        io.emit("publishProducts", products.docs);
       } catch (error) {
         socket.emit("statusError", error.message);
       }
@@ -15,9 +15,9 @@ export default (io) => {
 
     socket.on("deleteProduct", async (data) => {
       try {
-        const result = await ProductService.deleteProduct(data.pid);
-        const products = await ProductService.getAllProducts({});
-        socket.emit("publishProducts", products.docs);
+        const result = await ProductService.delete(data.pid);
+        const products = await ProductService.getAll({});
+        io.emit("publishProducts", products.docs);
       } catch (error) {
         socket.emit("statusError", error.message);
       }

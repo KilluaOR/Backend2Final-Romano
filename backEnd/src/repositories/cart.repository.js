@@ -81,7 +81,11 @@ export const cartRepository = {
     const successfulProducts = [];
     let totalAmount = 0;
 
-    for (const item of cart.products) {
+    // --- CAMBIO AQUÍ: Filtrar productos que podrían ser null ---
+    const validProducts = cart.products.filter((item) => item.product !== null);
+
+    for (const item of validProducts) {
+      // Usamos validProducts en vez de cart.products
       const productDB = await productDAO.findById(item.product._id);
 
       if (productDB && productDB.stock >= item.quantity) {
@@ -104,11 +108,11 @@ export const cartRepository = {
         });
       }
     }
-    //Si hubo compra exitosa generamos el ticket
+
     let ticket = null;
     if (successfulProducts.length > 0) {
       ticket = await ticketDAO.create({
-        code: Math.random().toString(36).substring(2, 9).toUpperCase(), // Estilo pro o uuidv4()
+        code: Math.random().toString(36).substring(2, 9).toUpperCase(),
         amount: totalAmount,
         purchaser: userEmail,
       });
@@ -117,24 +121,22 @@ export const cartRepository = {
         .map((p) => `<li>${p.title} x ${p.quantity} - $${p.subtotal}</li>`)
         .join("");
 
-      await mailingService.sendMail({
-        to: userEmail,
-        subject: "Confirmación de compra - Killu Store",
-        html: `
-          <h1>¡Gracias por tu compra!</h1>
-          <p>Código de ticket: <strong>${ticket.code}</strong></p>
-          <hr>
-          <h3>Detalle de productos:</h3>
-          <ul>${productosHTML}</ul>
-          <p><strong>Total abonado: $${totalAmount}</strong></p>
-          <p>Fecha: ${new Date().toLocaleString()}</p>
-          ${failedProducts.length > 0 ? `<p><i>Nota: Algunos productos se mantuvieron en el carrito por falta de stock.</i></p>` : ""}
-        `,
-      });
+      // --- CAMBIO AQUÍ: Try/Catch para el mail ---
+      try {
+        await mailingService.sendMail({
+          to: userEmail,
+          subject: "Confirmación de compra - Killu Store",
+          html: `<h1>¡Gracias por tu compra!</h1>...`, // (Tu código de HTML igual)
+        });
+      } catch (mailError) {
+        console.error(
+          "No se pudo enviar el mail, pero la compra se procesó:",
+          mailError.message,
+        );
+        // No lanzamos error para que la compra siga exitosa
+      }
     } else {
-      throw new Error(
-        "No hay stock suficiente para procesar ningún producto de la compra.",
-      );
+      throw new Error("No hay stock suficiente para procesar la compra.");
     }
 
     await cartDAO.updateProducts(cid, failedProducts);

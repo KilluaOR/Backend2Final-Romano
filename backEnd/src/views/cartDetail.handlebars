@@ -42,6 +42,13 @@
       <div class="fs-4">$ {{cartTotal products}}</div>
     </div>
   </div>
+
+  <div class="d-grid gap-2 mt-3">
+    <button class="btn btn-primary btn-lg" id="checkout-btn" type="button">
+      🚀 Finalizar Compra
+    </button>
+  </div>
+
 {{else}}
   <div class="alert alert-info">El carrito está vacío.</div>
 {{/if}}
@@ -81,6 +88,34 @@
 
       window.location.reload();
     });
+      // Lógica para finalizar la compra
+const checkoutBtn = document.getElementById('checkout-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', async () => {
+        const cid = '{{cid}}'; // Usamos el ID del carrito que viene del context
+        if (!cid) return alert("No se encontró el ID del carrito");
+
+        if (!confirm('¿Deseas finalizar la compra y generar tu ticket?')) return;
+
+        try {
+            const res = await fetch(`/api/carts/${cid}/purchase`, { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                alert('¡Compra exitosa! Ticket generado.');
+                window.location.href = '/products'; // Lo mandamos a productos de nuevo
+            } else {
+                alert('Error: ' + (data.message || 'No se pudo procesar la compra'));
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error al conectar con el servidor');
+        }
+    });
+}
   });
 </script>
 

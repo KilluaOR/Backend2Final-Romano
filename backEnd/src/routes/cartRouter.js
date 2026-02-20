@@ -22,14 +22,14 @@ router.get("/:cid", authenticate, requireUserCart, getProductsFromCartByID);
 router.post("/", createCart);
 
 router.post(
-  "/:cid/products/:pid",
+  "/:cid/product/:pid",
   authenticate,
   requireUserCart,
   addProductByID,
 );
 
 router.delete(
-  "/:cid/products/:pid",
+  "/:cid/product/:pid",
   authenticate,
   requireUserCart,
   deleteProductByID,

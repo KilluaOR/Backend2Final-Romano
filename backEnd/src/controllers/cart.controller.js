@@ -102,6 +102,7 @@ export const purchase = async (req, res) => {
 
     res.send({ status: "success", payload: result });
   } catch (error) {
+    console.error("❌ ERROR EN PURCHASE:", error);
     res.status(500).send({ status: "error", message: error.message });
   }
 };
