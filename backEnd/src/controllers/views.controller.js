@@ -35,6 +35,7 @@ export const getProductsList = async (req, res) => {
     res.render("productsList", {
       title: "Productos",
       style: "index.css",
+      jsFile: "ecommerce.js",
       products: JSON.parse(JSON.stringify(products.docs)),
       prevLink: products.prevLink,
       nextLink: products.nextLink,
@@ -51,7 +52,9 @@ export const getProductDetail = async (req, res) => {
     res.render("productDetail", {
       title: "Detalle de producto",
       style: "index.css",
+      jsFile: "ecommerce.js",
       product: JSON.parse(JSON.stringify(product)),
+      user: res.locals.user,
     });
   } catch (error) {
     res.status(404).render("notFound", {
@@ -66,6 +69,7 @@ export const getRealTimeProducts = async (req, res) => {
   res.render("realTimeProducts", {
     title: "Productos",
     style: "index.css",
+    jsFile: "index.js",
     products: JSON.parse(JSON.stringify(products.docs)),
     user: res.locals.user,
   });

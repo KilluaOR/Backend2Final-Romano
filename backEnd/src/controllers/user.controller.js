@@ -56,7 +56,6 @@ export const update = async (req, res) => {
       if (!isNaN(parsedAge)) updateData.age = parsedAge;
     }
 
-    // Solo el admin puede cambiar el rol
     if (isAdmin && typeof role === "string") updateData.role = role;
 
     const updated = await userService.update(uid, updateData);
@@ -75,8 +74,6 @@ export const update = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const { uid } = req.params;
-    // Asumiendo que solo el admin o el dueño puede borrar
-    // Podrías agregar el chequeo de isAdmin/isSelf aquí también si lo necesitas
 
     const result = await userService.delete(uid);
     if (result.deletedCount === 0) {

@@ -3,7 +3,7 @@ import { userService } from "./user.service.js";
 export const sessionsService = {
   // Para el login: buscamos al usuario por email
   login: async (email) => {
-    return await userService.getByEmail(email);
+    return await userService.getByEmail(email.toLowerCase());
   },
 
   // Para el registro: delegamos la creación

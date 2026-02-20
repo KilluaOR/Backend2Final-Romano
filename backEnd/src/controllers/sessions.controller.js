@@ -22,6 +22,7 @@ export const registerCallback = (req, res, err, user, info) => {
 
 // --- Login ---
 export const loginCallback = (req, res, err, user, info) => {
+  console.log("Datos recibidos en el login:", req.body);
   if (err || !user) {
     return res.status(401).json({
       status: "error",
