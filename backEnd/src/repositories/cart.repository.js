@@ -81,11 +81,9 @@ export const cartRepository = {
     const successfulProducts = [];
     let totalAmount = 0;
 
-    // --- CAMBIO AQUÍ: Filtrar productos que podrían ser null ---
     const validProducts = cart.products.filter((item) => item.product !== null);
 
     for (const item of validProducts) {
-      // Usamos validProducts en vez de cart.products
       const productDB = await productDAO.findById(item.product._id);
 
       if (productDB && productDB.stock >= item.quantity) {
@@ -121,19 +119,17 @@ export const cartRepository = {
         .map((p) => `<li>${p.title} x ${p.quantity} - $${p.subtotal}</li>`)
         .join("");
 
-      // --- CAMBIO AQUÍ: Try/Catch para el mail ---
       try {
         await mailingService.sendMail({
           to: userEmail,
           subject: "Confirmación de compra - Killu Store",
-          html: `<h1>¡Gracias por tu compra!</h1>...`, // (Tu código de HTML igual)
+          html: `<h1>¡Gracias por tu compra!</h1>...`,
         });
       } catch (mailError) {
         console.error(
           "No se pudo enviar el mail, pero la compra se procesó:",
           mailError.message,
         );
-        // No lanzamos error para que la compra siga exitosa
       }
     } else {
       throw new Error("No hay stock suficiente para procesar la compra.");

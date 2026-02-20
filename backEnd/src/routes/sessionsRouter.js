@@ -20,13 +20,13 @@ const mailLimiter = rateLimit({
 
 const passportCall = (strategy) => {
   return (req, res, next) => {
-    console.log(`Ejecutando estrategia: ${strategy}`); // <-- Log de control
+    console.log(`Ejecutando estrategia: ${strategy}`);
     passport.authenticate(strategy, { session: false }, (err, user, info) => {
       console.log("Resultado Passport:", {
         err,
         user: user ? "Encontrado" : "No encontrado",
         info,
-      }); // <-- Log clave
+      });
       if (strategy === "register")
         return registerCallback(req, res, err, user, info);
       if (strategy === "login") return loginCallback(req, res, err, user, info);

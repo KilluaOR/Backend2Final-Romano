@@ -40,10 +40,8 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-      // Carrito asociado al usuario logueado (evita que se mezcle entre cuentas)
       window.__CART_ID__ = '{{user.cart}}';
 
-      // Si se hace logout, limpiamos el cartId viejo por si quedó algo en localStorage
       document.addEventListener('DOMContentLoaded', () => {
         const logoutForm = document.querySelector('form[action="/api/sessions/logout"]');
         if (logoutForm) {

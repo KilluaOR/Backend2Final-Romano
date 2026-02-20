@@ -24,8 +24,6 @@ export const requireAdmin = requireRole(ROLES.ADMIN);
 
 export const requireUser = requireRole(ROLES.USER);
 
-//   Verifica que el carrito solicitado (:cid) sea el del usuario autenticado.
-
 export const requireUserCart = (req, res, next) => {
   if (!req.user) {
     return res.status(403).json({ status: "error", message: "No autorizado" });

@@ -23,7 +23,7 @@ import { toUserCurrentDTO } from "./dto/user.dto.js";
 // --- Configuración de Rutas y Env ---
 const __filenameApp = fileURLToPath(import.meta.url);
 const __dirnameApp = path.dirname(__filenameApp);
-const realRoot = path.resolve(__dirnameApp, "..", ".."); // Raíz del proyecto
+const realRoot = path.resolve(__dirnameApp, "..", "..");
 const envPath = path.join(realRoot, ".env");
 
 const result = dotenv.config({ path: envPath });
@@ -33,7 +33,7 @@ if (result.error && process.env.NODE_ENV !== "production") {
 
 const app = express();
 
-// --- Middlewares de Base (EL ORDEN IMPORTA) ---
+// --- Middlewares de Base ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -71,7 +71,7 @@ app.use(express.static(publicPath));
 initializePassport();
 app.use(passport.initialize());
 
-// --- Middleware de Sesión (JWT a res.locals) ---
+// --- Middleware de Sesión ---
 app.use(async (req, res, next) => {
   const token = req.signedCookies?.jwtCookie || req.cookies?.jwtCookie;
   if (!token) return next();

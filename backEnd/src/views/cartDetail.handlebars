@@ -92,7 +92,7 @@
 const checkoutBtn = document.getElementById('checkout-btn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', async () => {
-        const cid = '{{cid}}'; // Usamos el ID del carrito que viene del context
+        const cid = '{{cid}}';
         if (!cid) return alert("No se encontró el ID del carrito");
 
         if (!confirm('¿Deseas finalizar la compra y generar tu ticket?')) return;
@@ -106,7 +106,7 @@ if (checkoutBtn) {
 
             if (res.ok) {
                 alert('¡Compra exitosa! Ticket generado.');
-                window.location.href = '/products'; // Lo mandamos a productos de nuevo
+                window.location.href = '/products'; 
             } else {
                 alert('Error: ' + (data.message || 'No se pudo procesar la compra'));
             }
